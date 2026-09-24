@@ -10,6 +10,11 @@ import {
 import { getCurrentProfile, homeForRole } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
+const ERRORS = {
+  "non-autorizzato": "Il tuo account non è ancora abilitato. Contatta l'amministratore.",
+  "link-non-valido": "Il link è scaduto o è già stato usato. Richiedi un nuovo codice.",
+};
+
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const profile = await getCurrentProfile();
   if (profile?.role) redirect(homeForRole(profile.role));
@@ -24,9 +29,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <CardDescription>Accesso per istruttori e amministrazione.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {errore === "non-autorizzato" && (
+          {typeof errore === "string" && errore in ERRORS && (
             <p className="text-sm text-destructive" role="alert">
-              Il tuo account non è ancora abilitato. Contatta l&apos;amministratore.
+              {ERRORS[errore as keyof typeof ERRORS]}
             </p>
           )}
           <LoginForm next={typeof next === "string" ? next : undefined} />

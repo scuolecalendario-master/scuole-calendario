@@ -8,7 +8,11 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <div className="flex flex-1 flex-col">
       <StaffHeader
         title="Amministrazione"
-        links={[{ href: "/admin/report", label: "Report" }]}
+        links={[
+          { href: "/admin/report", label: "Report" },
+          { href: "/admin/scuole", label: "Scuole" },
+          { href: "/admin/istruttori", label: "Istruttori" },
+        ]}
         userLabel={profile.full_name ?? profile.email ?? ""}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">{children}</main>

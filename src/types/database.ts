@@ -161,6 +161,38 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_invites: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          invited_by: string | null
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -171,6 +203,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["user_role"]
       }
       generate_school_code: { Args: { school_name: string }; Returns: string }
+      is_staff_email: { Args: { p_email: string }; Returns: boolean }
       lesson_report: {
         Args: { p_from: string; p_school_id?: string; p_to: string }
         Returns: {
@@ -187,6 +220,7 @@ export type Database = {
           total_enrolled: number
         }[]
       }
+      regenerate_school_code: { Args: { p_school_id: string }; Returns: string }
       request_school_id: { Args: never; Returns: string }
     }
     Enums: {

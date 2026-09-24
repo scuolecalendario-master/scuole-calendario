@@ -4,6 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   Table,
   TableBody,
@@ -50,19 +51,14 @@ export default async function ReportPage({ searchParams }: PageProps<"/admin/rep
       <form className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
         <div className="flex flex-col gap-2">
           <Label htmlFor="scuola">Scuola</Label>
-          <select
-            id="scuola"
-            name="scuola"
-            defaultValue={filters.schoolId ?? ""}
-            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-          >
+          <NativeSelect id="scuola" name="scuola" defaultValue={filters.schoolId ?? ""}>
             <option value="">Tutte le scuole</option>
             {schoolOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="dal">Dal</Label>
