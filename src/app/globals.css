@@ -128,3 +128,34 @@
     @apply font-sans;
   }
 }
+/* FullCalendar (tema "forma") collegato ai colori dell'app */
+.lesson-calendar {
+  --fc-forma-primary: var(--primary);
+  --fc-forma-primary-over: color-mix(in oklch, var(--primary), var(--foreground) 15%);
+  --fc-forma-primary-down: color-mix(in oklch, var(--primary), var(--foreground) 25%);
+  --fc-forma-primary-foreground: var(--primary-foreground);
+  --fc-forma-event: var(--primary);
+  --fc-forma-event-contrast: var(--primary-foreground);
+  --fc-forma-background-event: var(--primary);
+  --fc-forma-highlight: color-mix(in oklch, var(--primary) 15%, transparent);
+  --fc-forma-background: var(--background);
+  --fc-forma-faint: color-mix(in oklch, var(--foreground) 3%, transparent);
+  --fc-forma-muted: var(--muted);
+  --fc-forma-strong: color-mix(in oklch, var(--foreground) 12%, transparent);
+  --fc-forma-stronger: color-mix(in oklch, var(--foreground) 16%, transparent);
+  --fc-forma-strongest: color-mix(in oklch, var(--foreground) 20%, transparent);
+  --fc-forma-foreground: var(--foreground);
+  --fc-forma-faint-foreground: color-mix(in oklch, var(--muted-foreground) 70%, transparent);
+  --fc-forma-muted-foreground: var(--muted-foreground);
+  --fc-forma-border: var(--border);
+  --fc-forma-muted-border: var(--border);
+  --fc-forma-strong-border: color-mix(in oklch, var(--border), var(--foreground) 15%);
+  --fc-forma-ring-color: var(--ring);
+  font-size: 14px;
+}
+
+/* Lezioni annullate: barrate e attenuate */
+.lesson-calendar .lesson-cancelled {
+  opacity: 0.55;
+  text-decoration: line-through;
+}

@@ -8,7 +8,10 @@ export default async function InstructorLayout({ children }: LayoutProps<"/istru
     <div className="flex flex-1 flex-col">
       <StaffHeader
         title="Istruttore"
-        links={[{ href: "/istruttore", label: "Oggi" }]}
+        links={[
+          { href: "/istruttore", label: "Oggi" },
+          { href: "/istruttore/calendario", label: "Calendario" },
+        ]}
         userLabel={profile.full_name ?? profile.email ?? ""}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">{children}</main>

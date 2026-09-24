@@ -9,6 +9,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
       <StaffHeader
         title="Amministrazione"
         links={[
+          { href: "/admin/calendario", label: "Calendario" },
           { href: "/admin/report", label: "Report" },
           { href: "/admin/scuole", label: "Scuole" },
           { href: "/admin/istruttori", label: "Istruttori" },
