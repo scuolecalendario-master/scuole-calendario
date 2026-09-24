@@ -19,9 +19,10 @@ export function SchoolCodeForm() {
       <Input
         id="code"
         name="code"
-        placeholder="Es. 3F9A1C7B2D4E6F80"
+        placeholder="Es. scuola-manzoni-8f3a1c2e"
         autoComplete="off"
-        autoCapitalize="characters"
+        autoCapitalize="none"
+        spellCheck={false}
         required
         aria-invalid={!!state.error}
       />

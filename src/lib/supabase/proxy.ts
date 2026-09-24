@@ -4,7 +4,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 import { supabaseKey, supabaseUrl } from "./env";
 
-const PROTECTED_PREFIXES = ["/dashboard"];
+// Controllo ottimistico (solo sessione): i ruoli sono verificati nei layout
+// con requireRole() e, in ultima istanza, dalle policy RLS.
+const PROTECTED_PREFIXES = ["/admin", "/istruttore"];
 
 /** Aggiorna la sessione Supabase e protegge le rotte riservate. */
 export async function updateSession(request: NextRequest) {
@@ -35,11 +37,10 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
   if (!user && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("next", pathname);
+    const url = new URL("/login", request.url);
+    url.searchParams.set("next", pathname + search);
     return NextResponse.redirect(url);
   }
 

@@ -1,62 +1,326 @@
-// Tipi allineati a supabase/migrations/20260924000000_init_schema.sql.
-// Per rigenerarli dal database: npx supabase gen types typescript --project-id <id> > src/types/database.ts
-
-export type UserRole = "admin" | "teacher";
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      schools: {
-        Row: { id: string; name: string; access_code: string; created_at: string };
-        Insert: { id?: string; name: string; access_code?: string; created_at?: string };
-        Update: { id?: string; name?: string; access_code?: string; created_at?: string };
-        Relationships: [];
-      };
       classes: {
-        Row: { id: string; school_id: string; name: string; school_year: string | null; created_at: string };
-        Insert: { id?: string; school_id: string; name: string; school_year?: string | null; created_at?: string };
-        Update: { id?: string; school_id?: string; name?: string; school_year?: string | null; created_at?: string };
+        Row: {
+          created_at: string
+          grade_name: string
+          id: string
+          school_id: string
+          total_enrolled: number
+        }
+        Insert: {
+          created_at?: string
+          grade_name: string
+          id?: string
+          school_id: string
+          total_enrolled?: number
+        }
+        Update: {
+          created_at?: string
+          grade_name?: string
+          id?: string
+          school_id?: string
+          total_enrolled?: number
+        }
         Relationships: [
-          { foreignKeyName: "classes_school_id_fkey"; columns: ["school_id"]; isOneToOne: false; referencedRelation: "schools"; referencedColumns: ["id"] },
-        ];
-      };
+          {
+            foreignKeyName: "classes_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
-          id: string; school_id: string; class_id: string; subject: string; teacher: string | null;
-          room: string | null; starts_at: string; ends_at: string; notes: string | null; created_at: string;
-        };
+          attendees_count: number | null
+          class_id: string
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          instructor_id: string | null
+          notes: string | null
+          school_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["lesson_status"]
+          updated_at: string
+        }
         Insert: {
-          id?: string; school_id?: string; class_id: string; subject: string; teacher?: string | null;
-          room?: string | null; starts_at: string; ends_at: string; notes?: string | null; created_at?: string;
-        };
+          attendees_count?: number | null
+          class_id: string
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          instructor_id?: string | null
+          notes?: string | null
+          school_id: string
+          start_time: string
+          status?: Database["public"]["Enums"]["lesson_status"]
+          updated_at?: string
+        }
         Update: {
-          id?: string; school_id?: string; class_id?: string; subject?: string; teacher?: string | null;
-          room?: string | null; starts_at?: string; ends_at?: string; notes?: string | null; created_at?: string;
-        };
+          attendees_count?: number | null
+          class_id?: string
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          instructor_id?: string | null
+          notes?: string | null
+          school_id?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["lesson_status"]
+          updated_at?: string
+        }
         Relationships: [
-          { foreignKeyName: "lessons_class_id_fkey"; columns: ["class_id"]; isOneToOne: false; referencedRelation: "classes"; referencedColumns: ["id"] },
-          { foreignKeyName: "lessons_school_id_fkey"; columns: ["school_id"]; isOneToOne: false; referencedRelation: "schools"; referencedColumns: ["id"] },
-        ];
-      };
+          {
+            foreignKeyName: "lessons_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
-        Row: { id: string; school_id: string | null; full_name: string | null; role: UserRole; created_at: string };
-        Insert: { id: string; school_id?: string | null; full_name?: string | null; role?: UserRole; created_at?: string };
-        Update: { id?: string; school_id?: string | null; full_name?: string | null; role?: UserRole; created_at?: string };
-        Relationships: [
-          { foreignKeyName: "profiles_school_id_fkey"; columns: ["school_id"]; isOneToOne: false; referencedRelation: "schools"; referencedColumns: ["id"] },
-        ];
-      };
-    };
-    Views: Record<never, never>;
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"] | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+        }
+        Relationships: []
+      }
+      schools: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          id: string
+          name: string
+          unique_code: string
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          unique_code: string
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          unique_code?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
-      request_school_id: { Args: Record<never, never>; Returns: string | null };
-      auth_school_id: { Args: Record<never, never>; Returns: string | null };
-      auth_is_admin: { Args: Record<never, never>; Returns: boolean };
-    };
-    Enums: { user_role: UserRole };
-    CompositeTypes: Record<never, never>;
-  };
-};
+      auth_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      generate_school_code: { Args: { school_name: string }; Returns: string }
+      lesson_report: {
+        Args: { p_from: string; p_school_id?: string; p_to: string }
+        Returns: {
+          attendees_total: number
+          class_id: string
+          expected_total: number
+          grade_name: string
+          lessons_cancelled: number
+          lessons_done: number
+          lessons_scheduled: number
+          lessons_total: number
+          school_id: string
+          school_name: string
+          total_enrolled: number
+        }[]
+      }
+      request_school_id: { Args: never; Returns: string }
+    }
+    Enums: {
+      lesson_status: "scheduled" | "done" | "cancelled"
+      user_role: "master" | "instructor"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-export type Tables<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      lesson_status: ["scheduled", "done", "cancelled"],
+      user_role: ["master", "instructor"],
+    },
+  },
+} as const

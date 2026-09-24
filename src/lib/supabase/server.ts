@@ -30,6 +30,16 @@ export async function createClient() {
   });
 }
 
+/** Normalizza un codice scuola come lo salva il database. */
+export function normalizeSchoolCode(code: string) {
+  return code.trim().toLowerCase();
+}
+
+/** Stesso formato imposto dal vincolo su schools.unique_code. */
+export function isValidSchoolCode(code: string) {
+  return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(code) && code.length >= 8 && code.length <= 64;
+}
+
 /**
  * Client anonimo che si identifica con il codice scuola.
  * Le policy RLS leggono l'header `x-school-code` e restituiscono
@@ -37,7 +47,7 @@ export async function createClient() {
  */
 export function createSchoolClient(schoolCode: string) {
   return createSupabaseClient<Database>(supabaseUrl, supabaseKey, {
-    global: { headers: { "x-school-code": schoolCode } },
+    global: { headers: { "x-school-code": normalizeSchoolCode(schoolCode) } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
