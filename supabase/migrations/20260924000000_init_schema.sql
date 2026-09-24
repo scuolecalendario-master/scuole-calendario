@@ -8,7 +8,7 @@
 --   * Personale autenticato (tabella profiles): legge i dati della propria
 --     scuola; gli utenti con ruolo 'admin' possono anche modificarli.
 --
--- Eseguire nello SQL Editor di Supabase (idempotente sulle funzioni/policy).
+-- Applicare con: npx supabase db push
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------

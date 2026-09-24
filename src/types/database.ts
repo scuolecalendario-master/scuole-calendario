@@ -1,4 +1,4 @@
-// Tipi allineati a supabase/schema.sql.
+// Tipi allineati a supabase/migrations/20260924000000_init_schema.sql.
 // Per rigenerarli dal database: npx supabase gen types typescript --project-id <id> > src/types/database.ts
 
 export type UserRole = "admin" | "teacher";
