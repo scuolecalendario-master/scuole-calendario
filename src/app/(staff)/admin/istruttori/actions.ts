@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
 import { dbErrorMessage, FormError, handleForm, readText, type ActionState } from "@/lib/forms";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
 
@@ -67,4 +68,44 @@ export async function revokeAccess(profileId: string) {
   const { error } = await supabase.from("profiles").update({ role: null }).eq("id", profileId);
   if (error) throw new Error(dbErrorMessage(error));
   revalidatePath("/admin/istruttori");
+}
+
+// Alfabeto senza caratteri ambigui (0/o, 1/l/i): facile da dettare o copiare
+const PASSWORD_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
+
+function temporaryPassword() {
+  const bytes = crypto.getRandomValues(new Uint32Array(12));
+  const chars = Array.from(bytes, (b) => PASSWORD_ALPHABET[b % PASSWORD_ALPHABET.length]);
+  // 3 gruppi da 4 caratteri, ~59 bit di entropia: basta per un uso singolo
+  return [0, 4, 8].map((i) => chars.slice(i, i + 4).join("")).join("-");
+}
+
+/**
+ * Imposta una password temporanea e obbliga l'utente a cambiarla al
+ * prossimo accesso. La password viene restituita una sola volta.
+ */
+export async function resetPassword(profileId: string): Promise<{ error?: string; password?: string }> {
+  const me = await requireRole("master");
+  if (profileId === me.id) {
+    return { error: "Per il tuo account usa \"Password\" in alto a destra." };
+  }
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return { error: "Reset non disponibile: manca la chiave segreta di Supabase sul server." };
+  }
+
+  const password = temporaryPassword();
+  const { error } = await admin.auth.admin.updateUserById(profileId, { password });
+  if (error) return { error: "Reset non riuscito, riprova." };
+
+  const { error: flagError } = await admin
+    .from("profiles")
+    .update({ must_change_password: true })
+    .eq("id", profileId);
+  if (flagError) return { error: "Password cambiata, ma non è stato possibile richiederne il cambio al primo accesso." };
+
+  return { password };
 }

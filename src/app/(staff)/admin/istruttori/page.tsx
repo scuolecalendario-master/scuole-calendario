@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
 import { deleteRegistrationCode, revokeAccess } from "./actions";
 import { CodeForm } from "./code-form";
+import { ResetPasswordButton } from "./reset-password";
 
 const ROLE_LABEL: Record<Enums<"user_role">, string> = {
   instructor: "Istruttore",
@@ -74,7 +75,7 @@ export default async function StaffPage() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Ruolo</TableHead>
-                <TableHead className="w-24" />
+                <TableHead className="w-56" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -87,13 +88,19 @@ export default async function StaffPage() {
                     {p.id === me.id ? (
                       <span className="text-xs text-muted-foreground">tu</span>
                     ) : (
-                      <ConfirmAction
-                        action={revokeAccess.bind(null, p.id)}
-                        trigger="Revoca"
-                        title={`Revocare l'accesso a ${p.full_name ?? p.email}?`}
-                        description="Non potrà più entrare nell'area riservata; le lezioni e le presenze registrate restano. Potrai riabilitarlo con un nuovo codice."
-                        confirmLabel="Revoca accesso"
-                      />
+                      <div className="flex justify-end gap-2">
+                        <ResetPasswordButton
+                          profileId={p.id}
+                          name={p.full_name ?? p.email ?? "utente"}
+                        />
+                        <ConfirmAction
+                          action={revokeAccess.bind(null, p.id)}
+                          trigger="Revoca"
+                          title={`Revocare l'accesso a ${p.full_name ?? p.email}?`}
+                          description="Non potrà più entrare nell'area riservata; le lezioni e le presenze registrate restano. Potrai riabilitarlo con un nuovo codice."
+                          confirmLabel="Revoca accesso"
+                        />
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>

@@ -17,7 +17,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, must_change_password")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -27,6 +27,8 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
       error: "Account non abilitato. Chiedi un codice di registrazione all'amministratore.",
     };
   }
+
+  if (profile.must_change_password) redirect("/password");
 
   const next = String(formData.get("next") ?? "");
   const home = homeForRole(profile.role);

@@ -17,7 +17,7 @@ export const getCurrentProfile = cache(async () => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role")
+    .select("id, email, full_name, role, must_change_password")
     .eq("id", userId)
     .maybeSingle();
 
@@ -41,5 +41,7 @@ export async function requireRole(...allowed: UserRole[]) {
   if (!profile.role || !allowed.includes(profile.role)) {
     redirect(homeForRole(profile.role));
   }
+  // Dopo un reset del master: prima di tutto va scelta una nuova password
+  if (profile.must_change_password) redirect("/password");
   return profile as typeof profile & { role: UserRole };
 }

@@ -6,7 +6,7 @@ import { supabaseKey, supabaseUrl } from "./env";
 
 // Controllo ottimistico (solo sessione): i ruoli sono verificati nei layout
 // con requireRole() e, in ultima istanza, dalle policy RLS.
-const PROTECTED_PREFIXES = ["/admin", "/istruttore"];
+const PROTECTED_PREFIXES = ["/admin", "/istruttore", "/password"];
 
 /** Aggiorna la sessione Supabase e protegge le rotte riservate. */
 export async function updateSession(request: NextRequest) {

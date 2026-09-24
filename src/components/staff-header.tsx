@@ -29,6 +29,12 @@ export function StaffHeader({
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <span className="hidden text-sm text-muted-foreground sm:inline">{userLabel}</span>
+          <Link
+            href="/password"
+            className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            Password
+          </Link>
           <form action={logout}>
             <Button type="submit" variant="ghost" size="sm">
               Esci
