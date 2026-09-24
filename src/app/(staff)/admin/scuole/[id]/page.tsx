@@ -89,7 +89,8 @@ export default async function SchoolDetailPage({ params }: PageProps<"/admin/scu
             <ul className="flex flex-col gap-2">
               {school.classes.map((c) => (
                 <ClassRow
-                  key={`${c.id}-${c.grade_name}-${c.total_enrolled}`}
+                  // Chiave stabile: la riga non si rimonta dopo il salvataggio (resta il messaggio)
+                  key={c.id}
                   gradeName={c.grade_name}
                   totalEnrolled={c.total_enrolled}
                   lessonsCount={c.lessons[0]?.count ?? 0}

@@ -8,7 +8,7 @@ import {
   normalizeSchoolCode,
 } from "@/lib/supabase/server";
 
-export type EnterCodeState = { error?: string };
+export type EnterCodeState = { error?: string; code?: string };
 
 export async function enterSchoolCode(
   _prev: EnterCodeState,
@@ -16,7 +16,7 @@ export async function enterSchoolCode(
 ): Promise<EnterCodeState> {
   const code = normalizeSchoolCode(String(formData.get("code") ?? ""));
   if (!isValidSchoolCode(code)) {
-    return { error: "Codice non valido. Esempio: scuola-manzoni-8f3a1c2e" };
+    return { error: "Codice non valido. Esempio: scuola-manzoni-8f3a1c2e", code };
   }
 
   // Grazie alla RLS la query restituisce una riga solo se il codice esiste.
@@ -25,8 +25,8 @@ export async function enterSchoolCode(
     .select("id")
     .maybeSingle();
 
-  if (error) return { error: "Errore di connessione, riprova." };
-  if (!school) return { error: "Nessuna scuola trovata con questo codice." };
+  if (error) return { error: "Errore di connessione, riprova.", code };
+  if (!school) return { error: "Nessuna scuola trovata con questo codice.", code };
 
   redirect(`/scuola/${code}`);
 }

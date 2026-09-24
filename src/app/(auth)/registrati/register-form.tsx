@@ -6,10 +6,12 @@ import { FormMessage } from "@/components/form-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { register } from "./actions";
+import { register, type RegisterState } from "./actions";
 
 export function RegisterForm({ code }: { code?: string }) {
-  const [state, formAction, pending] = useActionState(register, {});
+  const [state, formAction, pending] = useActionState<RegisterState, FormData>(register, {});
+  // Dopo un errore React azzera il form: i campi ripartono dai valori inviati
+  const v = state.values;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -18,7 +20,8 @@ export function RegisterForm({ code }: { code?: string }) {
         <Input
           id="code"
           name="code"
-          defaultValue={code}
+          key={v?.code}
+          defaultValue={v?.code ?? code}
           placeholder="ISTR-XXXX-XXXX"
           autoComplete="off"
           autoCapitalize="characters"
@@ -32,6 +35,8 @@ export function RegisterForm({ code }: { code?: string }) {
         <Input
           id="full_name"
           name="full_name"
+          key={v?.full_name}
+          defaultValue={v?.full_name}
           autoComplete="name"
           maxLength={120}
           className="h-11 text-base"
@@ -43,6 +48,8 @@ export function RegisterForm({ code }: { code?: string }) {
         <Input
           id="email"
           name="email"
+          key={v?.email}
+          defaultValue={v?.email}
           type="email"
           autoComplete="email"
           inputMode="email"

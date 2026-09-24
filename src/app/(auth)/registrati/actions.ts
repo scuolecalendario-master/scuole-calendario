@@ -8,7 +8,12 @@ import { createClient } from "@/lib/supabase/server";
 
 const MIN_PASSWORD = 8;
 
-export async function register(_prev: ActionState, formData: FormData): Promise<ActionState> {
+export type RegisterState = ActionState & {
+  /** Valori già inseriti, per non doverli riscrivere dopo un errore (mai la password). */
+  values?: { code: string; full_name: string; email: string };
+};
+
+export async function register(_prev: RegisterState, formData: FormData): Promise<RegisterState> {
   let home: string | undefined;
 
   const state = await handleForm(async () => {
@@ -73,5 +78,12 @@ export async function register(_prev: ActionState, formData: FormData): Promise<
   });
 
   if (home) redirect(home);
-  return state;
+  return {
+    ...state,
+    values: {
+      code: String(formData.get("code") ?? ""),
+      full_name: String(formData.get("full_name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+    },
+  };
 }

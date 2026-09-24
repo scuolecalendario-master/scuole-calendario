@@ -5,15 +5,17 @@ import { redirect } from "next/navigation";
 import { homeForRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
-export type LoginState = { error?: string };
+// `email` torna al form: dopo un errore il campo non va riscritto
+export type LoginState = { error?: string; email?: string };
 
 export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
+  const email = String(formData.get("email") ?? "").trim();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: String(formData.get("email") ?? "").trim(),
+    email,
     password: String(formData.get("password") ?? ""),
   });
-  if (error) return { error: "Email o password non corretti." };
+  if (error) return { error: "Email o password non corretti.", email };
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -25,6 +27,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     await supabase.auth.signOut();
     return {
       error: "Account non abilitato. Chiedi un codice di registrazione all'amministratore.",
+      email,
     };
   }
 

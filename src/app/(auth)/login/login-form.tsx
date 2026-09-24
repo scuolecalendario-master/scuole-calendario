@@ -17,6 +17,9 @@ export function LoginForm({ next }: { next?: string }) {
       <div className="flex flex-col gap-2">
         <Label htmlFor="email">Email</Label>
         <Input
+          // React azzera il form dopo l'invio: ripartiamo dall'email appena usata
+          key={state.email}
+          defaultValue={state.email}
           id="email"
           name="email"
           type="email"

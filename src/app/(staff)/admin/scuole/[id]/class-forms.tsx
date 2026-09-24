@@ -32,11 +32,13 @@ export function ClassRow({
       <form action={formAction} className="flex flex-wrap items-end gap-2">
         <div className="flex min-w-24 flex-1 flex-col gap-1">
           <Label className="text-xs text-muted-foreground">Classe</Label>
-          <Input name="grade_name" defaultValue={gradeName} maxLength={40} required />
+          {/* key: con un nuovo valore salvato il campo riparte dal default aggiornato */}
+          <Input key={gradeName} name="grade_name" defaultValue={gradeName} maxLength={40} required />
         </div>
         <div className="flex w-24 flex-col gap-1">
           <Label className="text-xs text-muted-foreground">Iscritti</Label>
           <Input
+            key={totalEnrolled}
             name="total_enrolled"
             type="number"
             inputMode="numeric"

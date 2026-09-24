@@ -24,6 +24,7 @@ export function SchoolForm({
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">Nome scuola</Label>
         <Input
+          key={defaults?.name}
           id="name"
           name="name"
           defaultValue={defaults?.name}
@@ -35,6 +36,7 @@ export function SchoolForm({
       <div className="flex flex-col gap-2">
         <Label htmlFor="contact_email">Email di contatto</Label>
         <Input
+          key={defaults?.contact_email ?? ""}
           id="contact_email"
           name="contact_email"
           type="email"

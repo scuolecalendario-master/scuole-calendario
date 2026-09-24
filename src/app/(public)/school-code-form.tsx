@@ -17,6 +17,8 @@ export function SchoolCodeForm() {
     <form action={formAction} className="flex flex-col gap-3">
       <Label htmlFor="code">Codice scuola</Label>
       <Input
+        key={state.code}
+        defaultValue={state.code}
         id="code"
         name="code"
         placeholder="Es. scuola-manzoni-8f3a1c2e"

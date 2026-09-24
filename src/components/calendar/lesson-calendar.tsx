@@ -101,7 +101,8 @@ export function LessonCalendar({
         const prefix = l.status === "done" ? "✓ " : l.status === "cancelled" ? "✕ " : "";
         return {
           id: l.id,
-          title: `${prefix}${l.schools?.name ?? ""} · ${l.classes?.grade_name ?? ""}`,
+          // Classe prima della scuola: nella vista settimana il titolo viene troncato
+          title: `${prefix}${l.classes?.grade_name ?? ""} · ${l.schools?.name ?? ""}`,
           start: `${l.date}T${l.start_time}`,
           end: `${l.date}T${l.end_time}`,
           color: colorBySchool.get(l.school_id),
@@ -237,9 +238,14 @@ export function LessonCalendar({
           allDaySlot={false}
           slotMinTime="07:00:00"
           slotMaxTime="19:00:00"
-          slotDuration="00:15:00"
+          // Righe da 30 minuti (pagina compatta), trascinamento a scatti di 15
+          slotDuration="00:30:00"
+          snapDuration="00:15:00"
           slotHeaderInterval="01:00:00"
           nowIndicator
+          // Vista elenco su smartphone: il titolo va a capo invece di essere troncato
+          listItemEventTitleClass="whitespace-normal break-words"
+          listItemEventInnerClass="flex-wrap"
           height="auto"
           // Filtri: una nuova funzione events fa ricaricare le lezioni
           events={fetchEvents}
