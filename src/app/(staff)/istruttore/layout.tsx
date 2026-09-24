@@ -9,7 +9,7 @@ export default async function InstructorLayout({ children }: LayoutProps<"/istru
       <StaffHeader
         title="Istruttore"
         links={[
-          { href: "/istruttore", label: "Oggi" },
+          { href: "/istruttore/oggi", label: "Oggi" },
           { href: "/istruttore/calendario", label: "Calendario" },
         ]}
         userLabel={profile.full_name ?? profile.email ?? ""}

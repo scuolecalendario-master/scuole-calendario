@@ -30,8 +30,10 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
   const next = String(formData.get("next") ?? "");
   const home = homeForRole(profile.role);
-  // Rispetta `next` solo se è un percorso interno dell'area del proprio ruolo.
-  const isInArea = next === home || [`${home}/`, `${home}?`].some((p) => next.startsWith(p));
+  // Rispetta `next` solo se è un percorso interno dell'area del proprio ruolo
+  // ("/admin…" per il master, "/istruttore…" per gli istruttori).
+  const area = home.split("/").slice(0, 2).join("/");
+  const isInArea = next === area || [`${area}/`, `${area}?`].some((p) => next.startsWith(p));
   redirect(isInArea ? next : home);
 }
 

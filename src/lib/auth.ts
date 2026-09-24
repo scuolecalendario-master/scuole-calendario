@@ -27,7 +27,7 @@ export const getCurrentProfile = cache(async () => {
 /** Pagina di destinazione dopo il login in base al ruolo. */
 export function homeForRole(role: UserRole | null | undefined) {
   if (role === "master") return "/admin";
-  if (role === "instructor") return "/istruttore";
+  if (role === "instructor") return "/istruttore/oggi";
   return "/login?errore=non-autorizzato";
 }
 
