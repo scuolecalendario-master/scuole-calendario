@@ -3,47 +3,68 @@
 import { revalidatePath } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
-import {
-  dbErrorMessage,
-  FormError,
-  handleForm,
-  readEmail,
-  readText,
-  type ActionState,
-} from "@/lib/forms";
+import { dbErrorMessage, FormError, handleForm, readText, type ActionState } from "@/lib/forms";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
 
 const ROLES: Enums<"user_role">[] = ["instructor", "master"];
+const VALIDITY_DAYS = [7, 14, 30];
 
-export async function inviteStaff(_prev: ActionState, formData: FormData) {
-  return handleForm(async () => {
+export type CreateCodeState = ActionState & { code?: string; label?: string | null };
+
+export async function createRegistrationCode(
+  _prev: CreateCodeState,
+  formData: FormData,
+): Promise<CreateCodeState> {
+  let created: { code: string; label: string | null } | undefined;
+
+  const state = await handleForm(async () => {
     const me = await requireRole("master");
-    const email = readEmail(formData, "email", { label: "Email", required: true })!;
     const role = String(formData.get("role") ?? "instructor") as Enums<"user_role">;
     if (!ROLES.includes(role)) throw new FormError("Ruolo non valido.");
-    if (email === me.email) throw new FormError("Non puoi modificare il tuo stesso accesso.");
+    const days = Number(formData.get("days"));
+    if (!VALIDITY_DAYS.includes(days)) throw new FormError("Durata non valida.");
 
     const supabase = await createClient();
-    const { error } = await supabase.from("staff_invites").upsert({
-      email,
-      role,
-      full_name: readText(formData, "full_name", { label: "Nome", max: 120 }),
-      invited_by: me.id,
-    });
+    const { data, error } = await supabase
+      .from("registration_codes")
+      .insert({
+        role,
+        label: readText(formData, "label", { label: "Nome istruttore", max: 120 }),
+        created_by: me.id,
+        expires_at: new Date(Date.now() + days * 86_400_000).toISOString(),
+      })
+      .select("code, label")
+      .single();
     if (error) throw new FormError(dbErrorMessage(error));
-
-    revalidatePath("/admin/istruttori");
-    return { success: `${email} abilitato. Può accedere da /login con "Ricevi codice via email".` };
+    created = data;
   });
+
+  if (!created) return state;
+  revalidatePath("/admin/istruttori");
+  return { ...created, success: "Codice creato." };
 }
 
-export async function revokeStaff(email: string) {
+/** Elimina un codice non ancora usato. */
+export async function deleteRegistrationCode(codeId: string) {
+  await requireRole("master");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("registration_codes")
+    .delete()
+    .eq("id", codeId)
+    .is("used_at", null);
+  if (error) throw new Error(dbErrorMessage(error));
+  revalidatePath("/admin/istruttori");
+}
+
+/** Revoca l'accesso: il profilo resta (con lo storico delle lezioni) ma senza ruolo. */
+export async function revokeAccess(profileId: string) {
   const me = await requireRole("master");
-  if (email === me.email) throw new Error("Non puoi revocare il tuo stesso accesso.");
+  if (profileId === me.id) throw new Error("Non puoi revocare il tuo stesso accesso.");
 
   const supabase = await createClient();
-  const { error } = await supabase.from("staff_invites").delete().eq("email", email);
+  const { error } = await supabase.from("profiles").update({ role: null }).eq("id", profileId);
   if (error) throw new Error(dbErrorMessage(error));
   revalidatePath("/admin/istruttori");
 }

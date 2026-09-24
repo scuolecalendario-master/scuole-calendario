@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
@@ -9,11 +10,6 @@ import {
 } from "@/components/ui/card";
 import { getCurrentProfile, homeForRole } from "@/lib/auth";
 import { LoginForm } from "./login-form";
-
-const ERRORS = {
-  "non-autorizzato": "Il tuo account non è ancora abilitato. Contatta l'amministratore.",
-  "link-non-valido": "Il link è scaduto o è già stato usato. Richiedi un nuovo codice.",
-};
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const profile = await getCurrentProfile();
@@ -29,12 +25,19 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <CardDescription>Accesso per istruttori e amministrazione.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {typeof errore === "string" && errore in ERRORS && (
+          {errore === "non-autorizzato" && (
             <p className="text-sm text-destructive" role="alert">
-              {ERRORS[errore as keyof typeof ERRORS]}
+              Il tuo account non è abilitato. Chiedi un codice di registrazione
+              all&apos;amministratore.
             </p>
           )}
           <LoginForm next={typeof next === "string" ? next : undefined} />
+          <p className="text-center text-sm text-muted-foreground">
+            Hai un codice di registrazione?{" "}
+            <Link href="/registrati" className="underline underline-offset-4">
+              Registrati
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </main>

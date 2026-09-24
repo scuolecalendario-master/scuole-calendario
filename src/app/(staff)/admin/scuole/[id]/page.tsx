@@ -14,7 +14,7 @@ import {
 } from "../actions";
 import { SchoolForm } from "../school-form";
 import { ClassRow, NewClassForm } from "./class-forms";
-import { CopyLink } from "./copy-link";
+import { CopyLink } from "@/components/copy-button";
 
 export default async function SchoolDetailPage({ params }: PageProps<"/admin/scuole/[id]">) {
   const { id } = await params;
