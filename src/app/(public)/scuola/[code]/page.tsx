@@ -6,6 +6,7 @@ import { classColor } from "@/lib/colors";
 import { formatCompact, formatTime, relativeDay } from "@/lib/dates";
 import { LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool } from "@/lib/portal";
+import { InstallBanner } from "@/components/install/install-banner";
 import { OpenRememberedClass } from "./remember-class";
 
 // Il codice è una credenziale: la pagina non va indicizzata.
@@ -37,6 +38,8 @@ export default async function SchoolPortalPage({ params, searchParams }: PagePro
         <h1 className="text-2xl font-bold">{school.name}</h1>
         <p className="mt-1 text-muted-foreground">Tocca la tua classe: la ricorderemo per la prossima volta.</p>
       </header>
+
+      <InstallBanner text="Apri il calendario con un tocco dalla Home." className="mb-6" />
 
       {groups.length === 0 ? (
         <p className="py-12 text-center text-muted-foreground">Nessuna classe inserita per ora.</p>

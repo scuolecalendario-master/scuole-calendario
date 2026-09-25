@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 import Link from "next/link";
 
+import { InstallBanner } from "@/components/install/install-banner";
 import { StaffHeader } from "@/components/staff-header";
 import { getAdminCounts } from "@/lib/admin-stats";
 import { requireRole } from "@/lib/auth";
@@ -40,7 +41,10 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           </Link>
         }
       />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+        <InstallBanner text="Apri l'app con un tocco dalla Home." className="mb-4" />
+        {children}
+      </main>
     </div>
   );
 }

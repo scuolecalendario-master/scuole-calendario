@@ -20,6 +20,7 @@ import { focusLabel, LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool, UUID } from "@/lib/portal";
 import { cn } from "@/lib/utils";
 import { ChangeClassButton, RememberClass } from "../../remember-class";
+import { InstallBanner } from "@/components/install/install-banner";
 import { RequestChangeButton } from "./request-dialog";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -116,6 +117,8 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
           <p className="mt-1 text-2xl font-bold">Nessuna lezione in programma</p>
         )}
       </section>
+
+      <InstallBanner text="La prossima lezione a un tocco dalla Home." className="-mt-4 mb-8" />
 
       {upcoming.length > 0 && (
         <section className="mb-8 flex flex-col gap-4">

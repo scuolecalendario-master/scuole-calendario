@@ -100,6 +100,7 @@ Numeri (orari, presenti, date) sempre con `tabular-nums`.
 | **Pulsante primario** | `--primary` pieno, testo bianco, una sola azione primaria per schermata. |
 | **Header staff** | barra `--primary` con testo bianco; voce attiva sottolineata/evidenziata; badge rossi numerici (richieste, da registrare). |
 | **Dialog** | titolo breve, azione primaria a destra, “Annulla” sempre presente. |
+| **Banner “Installa”** | `InstallBanner`: una riga breve + pulsante primario “Installa” + ✕. Android: prompt nativo; iPhone: 3 passaggi illustrati. Mai sopra l'informazione chiave (nel portale va sotto “Prossima lezione”); nascosto se l'app è già installata o chiuso con ✕. |
 | **Messaggi** | errore in `#B3231A` con `role="alert"`; conferma breve (“Salvato”). |
 
 ## 7. Pattern
