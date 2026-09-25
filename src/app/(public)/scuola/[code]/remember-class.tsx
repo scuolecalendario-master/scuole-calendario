@@ -1,0 +1,51 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+// La classe scelta dalla maestra viene ricordata su questo dispositivo, così
+// alle visite successive si apre subito (DESIGN.md: massimo 2 tocchi).
+// localStorage può non essere disponibile (navigazione privata): try/catch.
+
+const key = (code: string) => `classe:${code}`;
+
+/** Nella pagina della classe: la ricorda. */
+export function RememberClass({ code, classId }: { code: string; classId: string }) {
+  useEffect(() => {
+    try {
+      localStorage.setItem(key(code), classId);
+    } catch {}
+  }, [code, classId]);
+  return null;
+}
+
+/** Nella home dell'istituto: se c'è una classe ricordata (e ancora esistente) la apre. */
+export function OpenRememberedClass({ code, classIds }: { code: string; classIds: string[] }) {
+  const router = useRouter();
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(key(code));
+      if (saved && classIds.includes(saved)) router.replace(`/scuola/${code}/classe/${saved}`);
+    } catch {}
+  }, [code, classIds, router]);
+  return null;
+}
+
+/** "Cambia classe": dimentica la scelta e torna all'elenco. */
+export function ChangeClassButton({ code, className }: { code: string; className?: string }) {
+  const router = useRouter();
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={() => {
+        try {
+          localStorage.removeItem(key(code));
+        } catch {}
+        router.push(`/scuola/${code}?scegli=1`);
+      }}
+    >
+      Cambia classe
+    </button>
+  );
+}

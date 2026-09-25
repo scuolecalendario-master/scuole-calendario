@@ -1,125 +1,85 @@
+import { ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
-import { WeekSchedule } from "@/components/calendar/week-schedule";
-import { buttonVariants } from "@/components/ui/button";
-import { addDays, formatShort, isISODate, startOfWeek, todayISO } from "@/lib/dates";
-import {
-  createSchoolClient,
-  isValidSchoolCode,
-  normalizeSchoolCode,
-} from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
+import { classColor } from "@/lib/colors";
+import { formatCompact, formatTime, relativeDay } from "@/lib/dates";
+import { LEVEL_LABEL } from "@/lib/focus";
+import { getPortalSchool } from "@/lib/portal";
+import { OpenRememberedClass } from "./remember-class";
 
 // Il codice è una credenziale: la pagina non va indicizzata.
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default async function SchoolCalendarPage({
-  params,
-  searchParams,
-}: PageProps<"/scuola/[code]">) {
-  const code = normalizeSchoolCode((await params).code);
-  if (!isValidSchoolCode(code)) notFound();
+export default async function SchoolPortalPage({ params, searchParams }: PageProps<"/scuola/[code]">) {
+  const { code, school, supabase } = await getPortalSchool((await params).code);
+  const { scegli } = await searchParams;
 
-  const { settimana, classe } = await searchParams;
-  const weekStart = startOfWeek(isISODate(settimana) ? settimana : todayISO());
-  const weekEnd = addDays(weekStart, 6);
-  const classId =
-    typeof classe === "string" && /^[0-9a-f-]{36}$/i.test(classe) ? classe : undefined;
+  const [{ data: sites }, { data: classes }, { data: next }] = await Promise.all([
+    supabase.from("sites").select("id, name").order("name"),
+    supabase.from("classes").select("id, grade_name, level, site_id").order("grade_name"),
+    supabase.rpc("next_lessons"),
+  ]);
 
-  const supabase = createSchoolClient(code);
-
-  let lessonsQuery = supabase
-    .from("lessons")
-    .select(
-      "id, date, start_time, end_time, status, attendees_count, classes(grade_name, total_enrolled)",
-    )
-    .gte("date", weekStart)
-    .lte("date", weekEnd)
-    .order("date")
-    .order("start_time");
-  if (classId) lessonsQuery = lessonsQuery.eq("class_id", classId);
-
-  const [{ data: school }, { data: classes }, { data: lessons, error }] =
-    await Promise.all([
-      supabase.from("schools").select("name").maybeSingle(),
-      supabase.from("classes").select("id, grade_name").order("grade_name"),
-      lessonsQuery,
-    ]);
-
-  if (!school) notFound();
-
-  const href = (params: { settimana?: string; classe?: string }) => {
-    const q = new URLSearchParams();
-    if (params.settimana) q.set("settimana", params.settimana);
-    if (params.classe) q.set("classe", params.classe);
-    const s = q.toString();
-    return `/scuola/${code}${s ? `?${s}` : ""}`;
-  };
+  const nextByClass = new Map((next ?? []).map((n) => [n.class_id, n]));
+  const allClasses = classes ?? [];
+  const groups = [
+    ...(sites ?? []).map((s) => ({ key: s.id, title: s.name, classes: allClasses.filter((c) => c.site_id === s.id) })),
+    { key: "other", title: sites?.length ? "Altre classi" : null, classes: allClasses.filter((c) => !c.site_id) },
+  ].filter((g) => g.classes.length > 0);
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
+      {!scegli && <OpenRememberedClass code={code} classIds={allClasses.map((c) => c.id)} />}
+
       <header className="mb-6">
-        <p className="text-sm text-muted-foreground">Calendario lezioni di nuoto</p>
+        <p className="text-sm font-semibold text-primary">Lezioni di nuoto</p>
         <h1 className="text-2xl font-bold">{school.name}</h1>
+        <p className="mt-1 text-muted-foreground">Tocca la tua classe: la ricorderemo per la prossima volta.</p>
       </header>
 
-      <nav
-        aria-label="Settimana"
-        className="mb-4 flex flex-wrap items-center justify-between gap-2"
-      >
-        <div className="flex items-center gap-2">
-          <Link
-            href={href({ settimana: addDays(weekStart, -7), classe: classId })}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-            aria-label="Settimana precedente"
-          >
-            ←
-          </Link>
-          <Link
-            href={href({ classe: classId })}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            Oggi
-          </Link>
-          <Link
-            href={href({ settimana: addDays(weekStart, 7), classe: classId })}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-            aria-label="Settimana successiva"
-          >
-            →
-          </Link>
-        </div>
-        <span className="text-sm font-medium tabular-nums">
-          {formatShort(weekStart)} – {formatShort(weekEnd)}
-        </span>
-      </nav>
-
-      {classes && classes.length > 1 && (
-        <nav aria-label="Filtra per classe" className="mb-4 flex flex-wrap gap-2">
-          {[{ id: undefined, grade_name: "Tutte le classi" }, ...classes].map((c) => (
-            <Link
-              key={c.id ?? "all"}
-              href={href({ settimana: weekStart, classe: c.id })}
-              aria-current={c.id === classId ? "page" : undefined}
-              className={cn(
-                buttonVariants({
-                  variant: c.id === classId ? "default" : "ghost",
-                  size: "sm",
-                }),
-              )}
-            >
-              {c.grade_name}
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      {error ? (
-        <p className="text-destructive">Impossibile caricare le lezioni.</p>
+      {groups.length === 0 ? (
+        <p className="py-12 text-center text-muted-foreground">Nessuna classe inserita per ora.</p>
       ) : (
-        <WeekSchedule weekStart={weekStart} lessons={lessons ?? []} />
+        <div className="flex flex-col gap-8">
+          {groups.map((g) => (
+            <section key={g.key} className="flex flex-col gap-3">
+              {g.title && <h2 className="text-lg font-bold">{g.title}</h2>}
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {g.classes.map((c) => {
+                  const n = nextByClass.get(c.id);
+                  return (
+                    <li key={c.id}>
+                      <Link
+                        href={`/scuola/${code}/classe/${c.id}`}
+                        className="flex min-h-24 items-center gap-3 rounded-2xl p-4 text-white shadow-sm transition-transform active:scale-[0.98]"
+                        style={{ backgroundColor: classColor(c.id) }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-2xl leading-tight font-bold">
+                            {c.grade_name}{" "}
+                            <span className="text-sm font-semibold opacity-90">{LEVEL_LABEL[c.level]}</span>
+                          </p>
+                          <p className="mt-1 font-medium">
+                            {n ? (
+                              <>
+                                Prossima: {formatCompact(n.date)} · {formatTime(n.start_time)}
+                                <span className="block text-sm opacity-90">{relativeDay(n.date)}</span>
+                              </>
+                            ) : (
+                              "Nessuna lezione in programma"
+                            )}
+                          </p>
+                        </div>
+                        <ChevronRight className="size-7 shrink-0" aria-hidden />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
     </main>
   );

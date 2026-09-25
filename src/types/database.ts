@@ -432,6 +432,15 @@ export type Database = {
           total_enrolled: number
         }[]
       }
+      next_lessons: {
+        Args: never
+        Returns: {
+          class_id: string
+          date: string
+          end_time: string
+          start_time: string
+        }[]
+      }
       normalize_registration_code: { Args: { p_code: string }; Returns: string }
       redeem_registration_code: {
         Args: { p_code: string }

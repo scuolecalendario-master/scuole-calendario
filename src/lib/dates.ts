@@ -52,3 +52,40 @@ export const formatDay = (date: string) => dayFormat.format(toUTC(date));
 export const formatShort = (date: string) => shortFormat.format(toUTC(date));
 export const formatDate = (date: string) => numericFormat.format(toUTC(date));
 export const formatTime = (time: string) => time.slice(0, 5);
+
+/** Ora attuale in Italia "HH:MM". */
+export function nowTimeRome(): string {
+  return new Intl.DateTimeFormat("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: TIME_ZONE,
+  }).format(new Date());
+}
+
+/** Giorni tra due date "YYYY-MM-DD" (b − a). */
+export function daysBetween(a: string, b: string): number {
+  return Math.round((toUTC(b).getTime() - toUTC(a).getTime()) / 86_400_000);
+}
+
+/** "Oggi", "Domani", "Tra 5 giorni", "Tra 3 settimane". */
+export function relativeDay(date: string, today = todayISO()): string {
+  const d = daysBetween(today, date);
+  if (d === 0) return "Oggi";
+  if (d === 1) return "Domani";
+  if (d < 14) return `Tra ${d} giorni`;
+  return `Tra ${Math.round(d / 7)} settimane`;
+}
+
+const monthFormat = new Intl.DateTimeFormat("it-IT", { month: "long", year: "numeric", timeZone: "UTC" });
+const compactFormat = new Intl.DateTimeFormat("it-IT", {
+  weekday: "short",
+  day: "numeric",
+  month: "numeric",
+  timeZone: "UTC",
+});
+
+/** "settembre 2026" */
+export const formatMonth = (date: string) => monthFormat.format(toUTC(date));
+/** "mar 29/09" */
+export const formatCompact = (date: string) => compactFormat.format(toUTC(date)).replace(",", "");
