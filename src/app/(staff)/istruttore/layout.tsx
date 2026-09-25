@@ -9,6 +9,7 @@ export default async function InstructorLayout({ children }: LayoutProps<"/istru
     <div className="flex flex-1 flex-col">
       <StaffHeader
         title="Istruttore"
+        homeHref="/istruttore/oggi"
         links={[
           { href: "/istruttore/oggi", label: "Oggi" },
           { href: "/istruttore/calendario", label: "Calendario" },

@@ -6,6 +6,7 @@ import { STATUS_LABEL } from "@/components/lessons/status-badge";
 import { addDays, formatDay, formatMonth, formatTime, startOfSchoolYear, todayISO } from "@/lib/dates";
 import { focusLabel, LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool, UUID } from "@/lib/portal";
+import { BrandMark } from "@/components/brand";
 import { AutoPrint } from "./auto-print";
 
 export const metadata: Metadata = { title: "Calendario da stampare", robots: { index: false, follow: false } };
@@ -42,14 +43,17 @@ export default async function PrintClassPage({ params }: PageProps<"/scuola/[cod
         <AutoPrint />
       </div>
 
-      <header className="mb-4 border-b-2 border-black pb-2">
+      <header className="mb-4 flex items-center gap-3 border-b-2 border-black pb-2">
+        <BrandMark size={56} />
+        <div>
         <h1 className="text-2xl font-bold">
           Lezioni di nuoto · Classe {cls.grade_name} ({LEVEL_LABEL[cls.level]})
         </h1>
         <p>
           {school.name}
-          {cls.sites?.name ? ` · ${cls.sites.name}` : ""} · Anno scolastico {schoolYear}
+          {cls.sites?.name ? ` · ${cls.sites.name}` : ""} · Anno scolastico {schoolYear} · AquaClass Connect
         </p>
+        </div>
       </header>
 
       {byMonth.size === 0 ? (

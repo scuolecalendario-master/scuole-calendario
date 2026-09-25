@@ -22,6 +22,19 @@
 | **Istruttore** (smartphone, a bordo vasca) | `/istruttore/oggi` | lezioni di oggi e da registrare → **Svolta**, **presenti**, **focus** |
 | **Master** | `/admin` | cose da fare: richieste, lezioni da registrare, lezioni di oggi |
 
+## 2b. Marchio: AquaClass Connect
+
+- **Nome**: “AquaClass Connect” (breve: “AquaClass” per l'icona sul telefono).
+- **File**: `public/brand/aquaclass-logo.svg` (completo, con scritta) e `public/brand/aquaclass-mark.svg`
+  (solo emblema, per icone e intestazioni). Icone dell'app in `public/icons/` generate dall'emblema su fondo bianco.
+- **Componenti** (`src/components/brand.tsx`): `HomeLogo` (emblema + scritta, **è il tasto Home**),
+  `BrandHeader` (logo grande centrato su home/login/registrazione), `BrandMark`, `Wordmark`.
+- **Su sfondo blu** (header) l'emblema sta in un cerchio bianco; scritta bianca + “Connect” `#A5F3FC` (5,5:1).
+  **Su sfondo chiaro**: “AquaClass” `#0A2540` + “Connect” `#0060D6` (5,4:1; il `#0072FF` del logo grafico
+  non basta per il testo HTML).
+- **Home** del logo: master → `/admin`, istruttore → `/istruttore/oggi`, maestra → `/` (riapre la sua classe).
+- Non deformare, ricolorare o aggiungere effetti all'emblema.
+
 ## 3. Colori
 
 Tutte le coppie testo/sfondo rispettano **WCAG AA (≥ 4,5:1)**. I valori sono verificati, non vanno “ritoccati a occhio”:

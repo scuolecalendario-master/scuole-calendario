@@ -6,6 +6,7 @@ import { classColor } from "@/lib/colors";
 import { formatCompact, formatTime, relativeDay } from "@/lib/dates";
 import { LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool } from "@/lib/portal";
+import { HomeLogo } from "@/components/brand";
 import { InstallBanner } from "@/components/install/install-banner";
 import { OpenRememberedClass } from "./remember-class";
 
@@ -33,8 +34,9 @@ export default async function SchoolPortalPage({ params, searchParams }: PagePro
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
       {!scegli && <OpenRememberedClass code={code} classIds={allClasses.map((c) => c.id)} />}
 
+      <HomeLogo href="/" className="mb-5" />
+
       <header className="mb-6">
-        <p className="text-sm font-semibold text-primary">Lezioni di nuoto</p>
         <h1 className="text-2xl font-bold">{school.name}</h1>
         <p className="mt-1 text-muted-foreground">Tocca la tua classe: la ricorderemo per la prossima volta.</p>
       </header>

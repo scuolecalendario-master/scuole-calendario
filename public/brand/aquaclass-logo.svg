@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 40 380 380" >
+  <defs>
+    <!-- Gradiente Cerchio / Onde principali -->
+    <linearGradient id="mainBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A8FF" />
+      <stop offset="100%" stop-color="#0040A8" />
+    </linearGradient>
+
+    <!-- Gradiente Acqua Sfondo -->
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00C6FF" />
+      <stop offset="100%" stop-color="#0072FF" />
+    </linearGradient>
+
+    <!-- Gradiente Scuola/Edificio -->
+    <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A5F3FC" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+
+    <!-- Ciano per Spunte/Checkmarks -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="100%" stop-color="#4FACFE" />
+    </linearGradient>
+
+    <!-- Clip Path per contenere scuola e acqua dentro il cerchio principale -->
+    <clipPath id="circleClip">
+      <circle cx="250" cy="200" r="135" />
+    </clipPath>
+  </defs>
+
+  <!-- GRIGLIA CALENDARIO DI SFONDO (Trasparente attorno al logo) -->
+  <g opacity="0.45" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4 4">
+    <line x1="100" y1="120" x2="400" y2="120" />
+    <line x1="100" y1="170" x2="400" y2="170" />
+    <line x1="100" y1="220" x2="400" y2="220" />
+    <line x1="100" y1="270" x2="400" y2="270" />
+    
+    <line x1="130" y1="90" x2="130" y2="310" />
+    <line x1="370" y1="90" x2="370" y2="310" />
+  </g>
+
+  <!-- SPUNTE / CHECKMARKS COLOR CIANO (Calendario) -->
+  <g stroke="url(#cyanGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Spunta top-left -->
+    <path d="M 108 140 L 114 146 L 126 134" />
+    <!-- Spunta middle-left -->
+    <path d="M 108 190 L 114 196 L 126 184" />
+    <!-- Spunta bottom-left -->
+    <path d="M 108 240 L 114 246 L 126 234" />
+    
+    <!-- Spunta top-right -->
+    <path d="M 376 140 L 382 146 L 394 134" />
+    <!-- Spunta middle-right -->
+    <path d="M 376 190 L 382 196 L 394 184" />
+    <!-- Spunta bottom-right -->
+    <path d="M 376 240 L 382 246 L 394 234" />
+  </g>
+
+  <!-- SOLE SULLO SFONDO (Dietro la scuola) -->
+  <circle cx="215" cy="115" r="28" fill="#FDBA74" />
+
+  <!-- CONTENUTO DEL CERCHIO CENTRALE -->
+  <g clip-path="url(#circleClip)">
+    
+    <!-- Sfondo cielo dentro il cerchio -->
+    <rect x="100" y="50" width="300" height="300" fill="#E0F2FE" />
+
+    <!-- EDIFICIO SCOLASTICO -->
+    <g transform="translate(0, 5)">
+      <!-- Corpo Edificio Principale -->
+      <rect x="180" y="130" width="140" height="100" fill="url(#buildingGrad)" rx="4" />
+      
+      <!-- Tetto Centrale a Punta -->
+      <polygon points="250,75 165,135 335,135" fill="#0284C7" />
+      
+      <!-- Torre/Campanile Piccolo -->
+      <rect x="235" y="95" width="30" height="35" fill="#0369A1" />
+      
+      <!-- Orologio della scuola -->
+      <circle cx="250" cy="112" r="10" fill="#FFFFFF" />
+      <circle cx="250" cy="112" r="10" fill="none" stroke="#0284C7" stroke-width="2" />
+      <polyline points="250,107 250,112 254,112" fill="none" stroke="#0284C7" stroke-width="2" stroke-linecap="round" />
+
+      <!-- Finestre -->
+      <rect x="195" y="145" width="22" height="22" rx="3" fill="#FFFFFF" opacity="0.9" />
+      <rect x="283" y="145" width="22" height="22" rx="3" fill="#FFFFFF" opacity="0.9" />
+      
+      <!-- Porta d'ingresso -->
+      <path d="M 238 210 L 238 180 C 238 174 262 174 262 180 L 262 210 Z" fill="#FFFFFF" />
+      
+      <!-- Asta e Bandiera Italiana -->
+      <line x1="250" y1="75" x2="250" y2="52" stroke="#0284C7" stroke-width="3" stroke-linecap="round" />
+      <g transform="translate(250, 52)">
+        <rect x="0" y="0" width="6" height="12" fill="#16A34A" />
+        <rect x="6" y="0" width="6" height="12" fill="#FFFFFF" />
+        <rect x="12" y="0" width="6" height="12" fill="#DC2626" />
+      </g>
+    </g>
+
+    <!-- CORSIE DELLA PISCINA & ACQUA -->
+    <g transform="translate(0, 10)">
+      <!-- Sfondo Acqua -->
+      <path d="M 100,210 C 180,180 320,240 400,190 L 400,350 L 100,350 Z" fill="url(#waterGrad)" />
+
+      <!-- Linee Corsie Piscina in Prospettiva -->
+      <path d="M 120,210 L 180,340" stroke="#FFFFFF" stroke-width="4" opacity="0.5" stroke-dasharray="10 6" />
+      <path d="M 180,200 L 280,340" stroke="#FFFFFF" stroke-width="4" opacity="0.5" stroke-dasharray="10 6" />
+      <path d="M 250,200 L 370,330" stroke="#FFFFFF" stroke-width="4" opacity="0.5" stroke-dasharray="10 6" />
+
+      <!-- ONDE DINAMICHE -->
+      <path d="M 100,230 Q 180,200 260,230 T 400,220 L 400,350 L 100,350 Z" fill="#0080FF" opacity="0.7" />
+      <path d="M 100,250 Q 200,225 290,255 T 400,240 L 400,350 L 100,350 Z" fill="#0040A8" opacity="0.8" />
+
+      <!-- NUOTATORE -->
+      <g transform="translate(210, 215)">
+        <!-- Braccio che nuota -->
+        <path d="M 10 15 C 20 -10 45 -5 40 15" fill="none" stroke="#FDBA74" stroke-width="11" stroke-linecap="round" />
+        <!-- Testa con Cuffia -->
+        <circle cx="60" cy="18" r="16" fill="#0284C7" />
+        <!-- Viso -->
+        <path d="M 52 22 C 55 30 68 30 72 22" fill="#FDBA74" />
+        <!-- Occhialini -->
+        <rect x="54" y="16" width="16" height="8" rx="4" fill="#1E293B" />
+        <circle cx="58" cy="20" r="2.5" fill="#00F2FE" />
+        <circle cx="66" cy="20" r="2.5" fill="#00F2FE" />
+        <!-- Spruzzo d'acqua attorno al nuotatore -->
+        <path d="M -5 22 Q 15 12 35 25" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.9" />
+      </g>
+    </g>
+  </g>
+
+  <!-- ANELLO DI BORDO PRINCIPALE DEL LOGO -->
+  <circle cx="250" cy="200" r="135" fill="none" stroke="url(#mainBlueGrad)" stroke-width="14" />
+  <circle cx="250" cy="200" r="142" fill="none" stroke="#00F2FE" stroke-width="3" opacity="0.8" />
+
+  <!-- TESTO SOTTO IL LOGO (AquaClass Connect) -->
+  <text x="250" y="395" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+    <tspan font-size="38" font-weight="800" fill="#0A2540" letter-spacing="0.5">AquaClass </tspan>
+    <tspan font-size="38" font-weight="400" fill="#0072FF" letter-spacing="0.5">Connect</tspan>
+  </text>
+</svg>

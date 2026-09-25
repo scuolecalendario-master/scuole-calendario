@@ -14,10 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lezioni di nuoto",
-  description: "Calendario delle lezioni di nuoto della tua scuola",
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "Nuoto scuole", statusBarStyle: "default" },
+  title: { default: "AquaClass Connect", template: "%s · AquaClass Connect" },
+  description: "Calendario, presenze e focus delle lezioni di nuoto per le scuole",
+  applicationName: "AquaClass Connect",
+  icons: {
+    icon: [
+      { url: "/brand/aquaclass-mark.svg", type: "image/svg+xml" },
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: { capable: true, title: "AquaClass", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = { themeColor: "#0052CC" };

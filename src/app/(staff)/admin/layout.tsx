@@ -15,6 +15,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <div className="flex flex-1 flex-col">
       <StaffHeader
         title="Amministrazione"
+        homeHref="/admin"
         links={[
           { href: "/admin", label: "Oggi", exact: true, badge: toRecord },
           { href: "/admin/calendario", label: "Calendario" },

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { BrandHeader } from "@/components/brand";
 import {
   Card,
   CardContent,
@@ -20,27 +21,30 @@ export default async function PasswordPage() {
 
   return (
     <main className="flex flex-1 items-center justify-center p-6">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>{temporary ? "Scegli una nuova password" : "Cambia password"}</CardTitle>
-          <CardDescription>
-            {temporary
-              ? "Stai usando una password temporanea: per continuare scegline una tua."
-              : profile.email}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <PasswordForm temporary={temporary} />
-          {!temporary && (
-            <Link
-              href={homeForRole(profile.role)}
-              className="text-center text-sm text-muted-foreground underline underline-offset-4"
-            >
-              Annulla
-            </Link>
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <BrandHeader />
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{temporary ? "Scegli una nuova password" : "Cambia password"}</CardTitle>
+            <CardDescription>
+              {temporary
+                ? "Stai usando una password temporanea: per continuare scegline una tua."
+                : profile.email}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <PasswordForm temporary={temporary} />
+            {!temporary && (
+              <Link
+                href={homeForRole(profile.role)}
+                className="text-center text-sm text-muted-foreground underline underline-offset-4"
+              >
+                Annulla
+              </Link>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

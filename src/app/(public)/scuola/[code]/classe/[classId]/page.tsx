@@ -20,6 +20,7 @@ import { focusLabel, LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool, UUID } from "@/lib/portal";
 import { cn } from "@/lib/utils";
 import { ChangeClassButton, RememberClass } from "../../remember-class";
+import { HomeLogo } from "@/components/brand";
 import { InstallBanner } from "@/components/install/install-banner";
 import { RequestChangeButton } from "./request-dialog";
 
@@ -63,10 +64,8 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
       <RememberClass code={code} classId={cls.id} />
 
       <div className="mb-4 flex items-center justify-between gap-2">
-        <ChangeClassButton
-          code={code}
-          className="flex min-h-11 items-center gap-1 rounded-xl pr-3 font-semibold text-primary"
-        />
+        {/* Il logo è il tasto Home: riporta alla classe ricordata */}
+        <HomeLogo href="/" />
         <Link
           href={`/scuola/${code}/classe/${cls.id}/stampa`}
           className="flex min-h-11 items-center gap-2 rounded-xl border-2 bg-card px-4 font-semibold"
@@ -77,9 +76,12 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
       </div>
 
       <header className="mb-4">
-        <p className="text-sm font-semibold text-muted-foreground">
-          {school.name}
-          {cls.sites?.name ? ` · ${cls.sites.name}` : ""}
+        <p className="flex flex-wrap items-center gap-x-3 text-sm font-semibold text-muted-foreground">
+          <span>
+            {school.name}
+            {cls.sites?.name ? ` · ${cls.sites.name}` : ""}
+          </span>
+          <ChangeClassButton code={code} className="min-h-11 font-semibold text-primary underline underline-offset-4" />
         </p>
         <h1 className="text-3xl font-bold">
           Classe {cls.grade_name}{" "}

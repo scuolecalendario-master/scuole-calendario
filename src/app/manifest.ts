@@ -4,8 +4,8 @@ import type { MetadataRoute } from "next";
 // modo per ricevere le notifiche push.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Calendario lezioni di nuoto",
-    short_name: "Nuoto scuole",
+    name: "AquaClass Connect",
+    short_name: "AquaClass",
     description: "Calendario, presenze e richieste delle lezioni di nuoto per le scuole",
     // "/" smista: staff al proprio pannello, maestre alla scuola/classe ricordata
     start_url: "/",
