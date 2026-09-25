@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import {
@@ -23,8 +24,10 @@ import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDay, formatTime } from "@/lib/dates";
+import { LEVEL_STYLE } from "@/lib/colors";
+import { focusLabel } from "@/lib/focus";
 import { cn } from "@/lib/utils";
-import type { CalendarPerson, CalendarSchool, DialogTarget } from "./types";
+import type { CalendarLesson, CalendarPerson, CalendarSchool, DialogTarget } from "./types";
 
 export function LessonDialog({
   target,
@@ -63,6 +66,20 @@ export function LessonDialog({
   );
 }
 
+/** Focus registrati dall'istruttore (sola lettura). */
+function FocusList({ lesson }: { lesson: CalendarLesson }) {
+  if (lesson.status !== "done" || !lesson.focus.length || !lesson.classes) return null;
+  return (
+    <ul className="flex flex-wrap gap-1.5">
+      {lesson.focus.map((f) => (
+        <li key={f} className={cn("rounded-full px-3 py-1 text-sm font-semibold", LEVEL_STYLE[lesson.classes!.level].solid)}>
+          {focusLabel(f, lesson.focus_note)}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Sola lettura (istruttori). */
 function LessonDetails({
   target,
@@ -92,6 +109,14 @@ function LessonDetails({
         <dd className="tabular-nums">
           {l.attendees_count ?? "—"} / {l.classes?.total_enrolled}
         </dd>
+        {l.status === "done" && l.focus.length > 0 && (
+          <>
+            <dt className="text-muted-foreground">Focus</dt>
+            <dd>
+              <FocusList lesson={l} />
+            </dd>
+          </>
+        )}
         {l.notes && (
           <>
             <dt className="text-muted-foreground">Note</dt>
@@ -121,7 +146,6 @@ function LessonForm({
   const [schoolId, setSchoolId] = useState(lesson?.school_id ?? schools[0]?.id ?? "");
   const [classId, setClassId] = useState(lesson?.class_id ?? "");
   const [status, setStatus] = useState<LessonStatus>(lesson?.status ?? "scheduled");
-  const [repeat, setRepeat] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
@@ -157,8 +181,7 @@ function LessonForm({
           "Lezione aggiornata.",
         );
       } else {
-        const until = repeat ? String(formData.get("until") || "") || null : null;
-        const result = await createLessons(input, until);
+        const result = await createLessons(input, null);
         handle(result, result.count === 1 ? "Lezione creata." : `${result.count} lezioni create.`);
       }
     });
@@ -242,17 +265,13 @@ function LessonForm({
         </Field>
 
         {!lesson && (
-          <div className="flex flex-col gap-2 sm:col-span-2">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={repeat} onChange={(e) => setRepeat(e.target.checked)} className="size-4" />
-              Ripeti ogni settimana
-            </label>
-            {repeat && (
-              <Field label="Fino al (compreso)" htmlFor="until">
-                <Input id="until" name="until" type="date" min={defaults.date} required />
-              </Field>
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground sm:col-span-2">
+            Per un corso che si ripete ogni settimana usa{" "}
+            <Link href="/admin/programma" className="font-semibold text-primary underline">
+              Programma
+            </Link>
+            .
+          </p>
         )}
 
         {lesson && (
@@ -285,7 +304,14 @@ function LessonForm({
           </>
         )}
 
-        <Field label="Note" htmlFor="notes" className="sm:col-span-2">
+        {lesson && lesson.status === "done" && lesson.focus.length > 0 && (
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <span className="text-sm font-medium">Focus (registrati dall&apos;istruttore)</span>
+            <FocusList lesson={lesson} />
+          </div>
+        )}
+
+        <Field label="Note interne" htmlFor="notes" className="sm:col-span-2">
           <Textarea id="notes" name="notes" rows={2} maxLength={1000} defaultValue={lesson?.notes ?? ""} />
         </Field>
       </div>

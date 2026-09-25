@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import {
   Card,
@@ -7,11 +8,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getCurrentProfile, homeForRole } from "@/lib/auth";
+import { OpenLastSchool } from "./scuola/[code]/remember-class";
 import { SchoolCodeForm } from "./school-code-form";
 
-export default function HomePage() {
+export default async function HomePage({ searchParams }: PageProps<"/">) {
+  // Smistamento (anche per l'app installata sulla schermata Home)
+  const profile = await getCurrentProfile();
+  if (profile?.role) redirect(homeForRole(profile.role));
+  const { codice } = await searchParams;
+
   return (
     <main className="flex flex-1 items-center justify-center p-6">
+      {/* ?codice=nuovo permette di inserire un altro codice senza essere riportati indietro */}
+      {!codice && <OpenLastSchool />}
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Calendario lezioni di nuoto</CardTitle>

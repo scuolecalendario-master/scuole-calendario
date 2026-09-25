@@ -32,7 +32,7 @@ const PAGE = 1000; // limite righe per richiesta di PostgREST
 const DEFAULT_DURATION_MIN = 45;
 
 const LESSON_COLUMNS =
-  "id, date, start_time, end_time, status, attendees_count, notes, class_id, school_id, instructor_id, classes(grade_name, total_enrolled), schools(name)";
+  "id, date, start_time, end_time, status, attendees_count, focus, focus_note, notes, class_id, school_id, instructor_id, classes(grade_name, total_enrolled, level), schools(name)";
 
 /** "2026-09-24T09:00:00+02:00" → { date: "2026-09-24", time: "09:00" } (già nel fuso del calendario) */
 function splitStr(str: string) {
@@ -50,12 +50,18 @@ export function LessonCalendar({
   schools,
   instructors,
   currentUserId,
+  initialDate,
+  openLessonId,
 }: {
   /** true = master: crea, sposta, modifica ed elimina. false = sola lettura. */
   editable: boolean;
   schools: CalendarSchool[];
   instructors: CalendarPerson[];
   currentUserId: string;
+  /** Data su cui aprire il calendario (es. da "Apri nel calendario"). */
+  initialDate?: string;
+  /** Lezione di cui aprire subito il dettaglio. */
+  openLessonId?: string;
 }) {
   const calendarRef = useRef<CalendarRef>(null);
   const [schoolId, setSchoolId] = useState("");
@@ -63,6 +69,8 @@ export function LessonCalendar({
   const [instructorId, setInstructorId] = useState("");
   const [dialog, setDialog] = useState<DialogTarget | null>(null);
   const [notice, setNotice] = useState<{ type: "ok" | "error"; text: string } | null>(null);
+  // La lezione richiesta via URL si apre una sola volta, al primo caricamento
+  const pendingOpen = useRef(openLessonId);
 
   const supabase = useMemo(() => createClient(), []);
   const colorBySchool = useMemo(() => new Map(schools.map((s) => [s.id, s.color])), [schools]);
@@ -95,6 +103,12 @@ export function LessonCalendar({
         if (error) throw new Error(error.message);
         lessons.push(...(data as CalendarLesson[]));
         if (data.length < PAGE) break;
+      }
+
+      const toOpen = pendingOpen.current && lessons.find((l) => l.id === pendingOpen.current);
+      if (toOpen) {
+        pendingOpen.current = undefined;
+        setDialog({ mode: "edit", lesson: toOpen });
       }
 
       return lessons.map((l) => {
@@ -228,6 +242,7 @@ export function LessonCalendar({
           locale={itLocale}
           timeZone={TIME_ZONE}
           initialView={isMobile ? "listWeek" : "timeGridWeek"}
+          initialDate={initialDate}
           headerToolbar={
             isMobile
               ? { start: "prev,next", center: "title", end: "listWeek,timeGridDay" }

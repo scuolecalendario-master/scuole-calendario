@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,9 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Calendario Scuole",
-  description: "Orari e lezioni della tua scuola",
+  title: "Lezioni di nuoto",
+  description: "Calendario delle lezioni di nuoto della tua scuola",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "Nuoto scuole", statusBarStyle: "default" },
 };
+
+export const viewport: Viewport = { themeColor: "#0052CC" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -8,12 +8,15 @@ import { useEffect } from "react";
 // localStorage può non essere disponibile (navigazione privata): try/catch.
 
 const key = (code: string) => `classe:${code}`;
+/** Ultimo istituto visitato: la home "/" (anche dall'app sulla schermata Home) lo riapre. */
+export const LAST_SCHOOL_KEY = "ultima-scuola";
 
 /** Nella pagina della classe: la ricorda. */
 export function RememberClass({ code, classId }: { code: string; classId: string }) {
   useEffect(() => {
     try {
       localStorage.setItem(key(code), classId);
+      localStorage.setItem(LAST_SCHOOL_KEY, code);
     } catch {}
   }, [code, classId]);
   return null;
@@ -24,6 +27,7 @@ export function OpenRememberedClass({ code, classIds }: { code: string; classIds
   const router = useRouter();
   useEffect(() => {
     try {
+      localStorage.setItem(LAST_SCHOOL_KEY, code);
       const saved = localStorage.getItem(key(code));
       if (saved && classIds.includes(saved)) router.replace(`/scuola/${code}/classe/${saved}`);
     } catch {}
@@ -48,4 +52,16 @@ export function ChangeClassButton({ code, className }: { code: string; className
       Cambia classe
     </button>
   );
+}
+
+/** Nella home "/": riapre l'ultimo istituto visitato su questo dispositivo. */
+export function OpenLastSchool() {
+  const router = useRouter();
+  useEffect(() => {
+    try {
+      const code = localStorage.getItem(LAST_SCHOOL_KEY);
+      if (code && /^[a-z0-9-]{8,64}$/.test(code)) router.replace(`/scuola/${code}`);
+    } catch {}
+  }, [router]);
+  return null;
 }

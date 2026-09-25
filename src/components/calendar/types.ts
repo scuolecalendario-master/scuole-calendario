@@ -17,11 +17,13 @@ export type CalendarLesson = {
   end_time: string;
   status: Enums<"lesson_status">;
   attendees_count: number | null;
+  focus: string[];
+  focus_note: string | null;
   notes: string | null;
   class_id: string;
   school_id: string;
   instructor_id: string | null;
-  classes: { grade_name: string; total_enrolled: number } | null;
+  classes: { grade_name: string; total_enrolled: number; level: Enums<"school_level"> } | null;
   schools: { name: string } | null;
 };
 
