@@ -4,7 +4,8 @@ export type CalendarSchool = {
   id: string;
   name: string;
   color: string;
-  classes: { id: string; grade_name: string; total_enrolled: number }[];
+  sites: { id: string; name: string }[];
+  classes: { id: string; grade_name: string; total_enrolled: number; site_id: string | null }[];
 };
 
 export type CalendarPerson = { id: string; name: string };

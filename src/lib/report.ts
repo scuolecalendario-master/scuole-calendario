@@ -2,7 +2,7 @@ import "server-only";
 
 import { isISODate, startOfSchoolYear, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/types/database";
+import type { Database, Enums } from "@/types/database";
 
 export type ClassReportRow =
   Database["public"]["Functions"]["lesson_report"]["Returns"][number];
@@ -23,7 +23,12 @@ export type ReportTotals = {
 export type SchoolReport = ReportTotals & {
   schoolId: string;
   schoolName: string;
-  classes: (ReportTotals & { classId: string; gradeName: string })[];
+  classes: (ReportTotals & {
+    classId: string;
+    gradeName: string;
+    siteName: string | null;
+    level: Enums<"school_level">;
+  })[];
 };
 
 export type ReportFilters = { from: string; to: string; schoolId: string | null };
@@ -75,11 +80,25 @@ export async function getReport(filters: ReportFilters) {
     classes: rows.map((r) => ({
       classId: r.class_id,
       gradeName: r.grade_name,
+      siteName: r.site_name,
+      level: r.level,
       ...totals([r]),
     })),
   }));
 
   return { schools, overall: totals(data) };
+}
+
+/** Focus lavorati nelle lezioni svolte del periodo, per livello (più frequenti prima). */
+export async function getFocusReport(filters: ReportFilters) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("focus_report", {
+    p_from: filters.from,
+    p_to: filters.to,
+    ...(filters.schoolId ? { p_school_id: filters.schoolId } : {}),
+  });
+  if (error) throw new Error(`Report focus non disponibile: ${error.message}`);
+  return data;
 }
 
 export async function getSchoolOptions() {

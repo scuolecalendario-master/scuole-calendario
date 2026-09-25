@@ -66,6 +66,7 @@ export function LessonCalendar({
 }) {
   const calendarRef = useRef<CalendarRef>(null);
   const [schoolId, setSchoolId] = useState("");
+  const [siteId, setSiteId] = useState("");
   const [classId, setClassId] = useState("");
   const [instructorId, setInstructorId] = useState("");
   const [dialog, setDialog] = useState<DialogTarget | null>(null);
@@ -75,7 +76,16 @@ export function LessonCalendar({
 
   const supabase = useMemo(() => createClient(), []);
   const colorBySchool = useMemo(() => new Map(schools.map((s) => [s.id, s.color])), [schools]);
-  const classesOfSchool = schools.find((s) => s.id === schoolId)?.classes ?? [];
+  const school = schools.find((s) => s.id === schoolId);
+  const sitesOfSchool = school?.sites ?? [];
+  const classesOfSchool = (school?.classes ?? []).filter((c) => !siteId || c.site_id === siteId);
+  const siteClassIds = useMemo(
+    () =>
+      siteId
+        ? (schools.find((s) => s.id === schoolId)?.classes ?? []).filter((c) => c.site_id === siteId).map((c) => c.id)
+        : [],
+    [siteId, schoolId, schools],
+  );
   // Su smartphone la vista a elenco è più leggibile della griglia oraria
   const [isMobile] = useState(() => window.matchMedia("(max-width: 767px)").matches);
   // Su smartphone il titolo (periodo visualizzato) sta sopra il calendario
@@ -99,6 +109,8 @@ export function LessonCalendar({
           .range(offset, offset + PAGE - 1);
         if (schoolId) query = query.eq("school_id", schoolId);
         if (classId) query = query.eq("class_id", classId);
+        // Plesso: le lezioni non hanno il plesso, si filtra per le sue classi
+        else if (siteId) query = query.in("class_id", siteClassIds.length ? siteClassIds : ["00000000-0000-0000-0000-000000000000"]);
         if (instructorId === "none") query = query.is("instructor_id", null);
         else if (instructorId) query = query.eq("instructor_id", instructorId);
 
@@ -129,7 +141,7 @@ export function LessonCalendar({
         };
       });
     },
-    [supabase, schoolId, classId, instructorId, colorBySchool],
+    [supabase, schoolId, siteId, siteClassIds, classId, instructorId, colorBySchool],
   );
 
   const refetch = () => calendarRef.current?.getApi().refetchEvents();
@@ -177,23 +189,44 @@ export function LessonCalendar({
         <summary className="flex min-h-11 cursor-pointer items-center justify-between font-semibold md:hidden">
           <span>
             Filtri
-            {(schoolId || classId || instructorId) && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">attivi</span>}
+            {(schoolId || siteId || classId || instructorId) && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">attivi</span>}
           </span>
           <span className="text-sm text-primary group-open:hidden">Mostra</span>
           <span className="hidden text-sm text-primary group-open:inline">Nascondi</span>
         </summary>
-        <div className="mt-2 grid gap-3 sm:grid-cols-3 md:mt-0">
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 md:mt-0 lg:grid-cols-4">
         <Filter label="Istituto" id="f-school">
           <NativeSelect
             id="f-school"
             value={schoolId}
             onChange={(e) => {
               setSchoolId(e.target.value);
+              setSiteId("");
               setClassId("");
             }}
           >
             <option value="">Tutti gli istituti</option>
             {schools.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </NativeSelect>
+        </Filter>
+        <Filter label="Plesso" id="f-site">
+          <NativeSelect
+            id="f-site"
+            value={siteId}
+            onChange={(e) => {
+              setSiteId(e.target.value);
+              setClassId("");
+            }}
+            disabled={!sitesOfSchool.length}
+          >
+            <option value="">
+              {!schoolId ? "Scegli prima un istituto" : sitesOfSchool.length ? "Tutti i plessi" : "Nessun plesso"}
+            </option>
+            {sitesOfSchool.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>

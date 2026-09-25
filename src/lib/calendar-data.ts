@@ -10,9 +10,10 @@ export async function getCalendarData() {
   const [{ data: schools }, { data: staff }] = await Promise.all([
     supabase
       .from("schools")
-      .select("id, name, classes(id, grade_name, total_enrolled)")
+      .select("id, name, sites(id, name), classes(id, grade_name, total_enrolled, site_id)")
       .order("name")
-      .order("grade_name", { referencedTable: "classes" }),
+      .order("grade_name", { referencedTable: "classes" })
+      .order("name", { referencedTable: "sites" }),
     supabase
       .from("profiles")
       .select("id, full_name, email")

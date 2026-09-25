@@ -413,6 +413,14 @@ export type Database = {
         Args: { p_level: Database["public"]["Enums"]["school_level"] }
         Returns: string[]
       }
+      focus_report: {
+        Args: { p_from: string; p_school_id?: string; p_to: string }
+        Returns: {
+          focus: string
+          lessons: number
+          level: Database["public"]["Enums"]["school_level"]
+        }[]
+      }
       generate_registration_code: { Args: never; Returns: string }
       generate_school_code: { Args: { school_name: string }; Returns: string }
       is_class_instructor: { Args: { p_class_id: string }; Returns: boolean }
@@ -427,8 +435,10 @@ export type Database = {
           lessons_done: number
           lessons_scheduled: number
           lessons_total: number
+          level: Database["public"]["Enums"]["school_level"]
           school_id: string
           school_name: string
+          site_name: string
           total_enrolled: number
         }[]
       }
