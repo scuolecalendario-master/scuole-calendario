@@ -5,6 +5,7 @@ import "@fullcalendar/react/themes/forma/theme.css";
 
 import FullCalendar, {
   type CalendarRef,
+  type DatesSetInfo,
   type DateSelectInfo,
   type EventChangeInfo,
   type EventClickInfo,
@@ -77,6 +78,8 @@ export function LessonCalendar({
   const classesOfSchool = schools.find((s) => s.id === schoolId)?.classes ?? [];
   // Su smartphone la vista a elenco è più leggibile della griglia oraria
   const [isMobile] = useState(() => window.matchMedia("(max-width: 767px)").matches);
+  // Su smartphone il titolo (periodo visualizzato) sta sopra il calendario
+  const [title, setTitle] = useState("");
 
   const fetchEvents = useCallback(
     async (info: EventSourceFuncInfo): Promise<EventInput[]> => {
@@ -166,8 +169,21 @@ export function LessonCalendar({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Filter label="Scuola" id="f-school">
+      {/* Su smartphone i filtri sono raccolti: prima il calendario (DESIGN.md §1) */}
+      <details
+        open={!isMobile}
+        className="group rounded-2xl border-2 bg-card p-3 open:pb-4 md:border-0 md:bg-transparent md:p-0"
+      >
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between font-semibold md:hidden">
+          <span>
+            Filtri
+            {(schoolId || classId || instructorId) && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">attivi</span>}
+          </span>
+          <span className="text-sm text-primary group-open:hidden">Mostra</span>
+          <span className="hidden text-sm text-primary group-open:inline">Nascondi</span>
+        </summary>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3 md:mt-0">
+        <Filter label="Istituto" id="f-school">
           <NativeSelect
             id="f-school"
             value={schoolId}
@@ -176,7 +192,7 @@ export function LessonCalendar({
               setClassId("");
             }}
           >
-            <option value="">Tutte le scuole</option>
+            <option value="">Tutti gli istituti</option>
             {schools.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -191,7 +207,7 @@ export function LessonCalendar({
             onChange={(e) => setClassId(e.target.value)}
             disabled={!schoolId}
           >
-            <option value="">{schoolId ? "Tutte le classi" : "Scegli prima una scuola"}</option>
+            <option value="">{schoolId ? "Tutte le classi" : "Scegli prima un istituto"}</option>
             {classesOfSchool.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.grade_name}
@@ -212,7 +228,8 @@ export function LessonCalendar({
               ))}
           </NativeSelect>
         </Filter>
-      </div>
+        </div>
+      </details>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         {schools
@@ -224,7 +241,7 @@ export function LessonCalendar({
             </span>
           ))}
         <span>✓ {STATUS_LABEL.done} · ✕ {STATUS_LABEL.cancelled}</span>
-        {editable && <span className="ml-auto">Trascina per spostare · seleziona uno spazio vuoto per creare</span>}
+        {editable && <span className="ml-auto hidden md:inline">Trascina per spostare · seleziona uno spazio vuoto per creare</span>}
       </div>
 
       {notice && (
@@ -236,18 +253,22 @@ export function LessonCalendar({
         </p>
       )}
 
+      {isMobile && title && <h2 className="text-center text-lg font-bold first-letter:uppercase">{title}</h2>}
+
       <div className="lesson-calendar">
         <FullCalendar
           ref={calendarRef}
           plugins={[formaTheme, dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
           locale={itLocale}
           timeZone={TIME_ZONE}
-          initialView={isMobile ? "listWeek" : "timeGridWeek"}
+          // Su smartphone si parte dal giorno (più leggibile); le viste sono le stesse ovunque
+          initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
           initialDate={initialDate}
+          datesSet={(info: DatesSetInfo) => setTitle(info.view.title)}
           headerToolbar={
             isMobile
-              ? { start: "prev,next", center: "title", end: "listWeek,timeGridDay" }
-              : { start: "prev,next today", center: "title", end: "timeGridWeek,dayGridMonth,listWeek" }
+              ? { start: "prev,next today", end: "dayGridMonth,timeGridWeek,timeGridDay,listWeek" }
+              : { start: "prev,next today", center: "title", end: "dayGridMonth,timeGridWeek,timeGridDay,listWeek" }
           }
           firstDay={1}
           hiddenDays={[0]}
