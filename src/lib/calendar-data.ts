@@ -1,14 +1,8 @@
 import "server-only";
 
-import { SCHOOL_COLORS, type CalendarPerson, type CalendarSchool } from "@/components/calendar/types";
+import type { CalendarPerson, CalendarSchool } from "@/components/calendar/types";
+import { schoolColor } from "@/lib/colors";
 import { createClient } from "@/lib/supabase/server";
-
-/** Colore stabile per scuola: non cambia quando se ne aggiungono o tolgono altre. */
-function schoolColor(id: string) {
-  let hash = 0;
-  for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
-  return SCHOOL_COLORS[hash % SCHOOL_COLORS.length];
-}
 
 /** Scuole (con classi e colore) e personale per filtri e form del calendario. */
 export async function getCalendarData() {

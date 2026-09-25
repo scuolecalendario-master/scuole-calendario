@@ -30,8 +30,3 @@ export type DialogTarget =
   | { mode: "edit"; lesson: CalendarLesson }
   | { mode: "create"; date: string; startTime: string; endTime: string };
 
-// Colori distinguibili (anche in dark mode) per le scuole, assegnati in base all'id della scuola.
-export const SCHOOL_COLORS = [
-  "#2563eb", "#16a34a", "#d97706", "#9333ea", "#dc2626",
-  "#0891b2", "#db2777", "#65a30d", "#7c3aed", "#ea580c",
-];

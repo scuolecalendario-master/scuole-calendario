@@ -1,46 +1,45 @@
 import Link from "next/link";
 
 import { logout } from "@/app/(auth)/login/actions";
-import { Button } from "@/components/ui/button";
+import { StaffNav, type StaffLink } from "@/components/staff-nav";
 
 export function StaffHeader({
   title,
   links,
   userLabel,
+  actions,
 }: {
   title: string;
-  links: { href: string; label: string }[];
+  links: StaffLink[];
   userLabel: string;
+  /** Elementi extra a destra (es. campanella notifiche). */
+  actions?: React.ReactNode;
 }) {
   return (
-    <header className="border-b">
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
-        <span className="font-semibold">{title}</span>
-        <nav className="flex gap-1">
-          {links.map((l) => (
+    <header className="bg-primary text-primary-foreground">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold">{title}</span>
+          <div className="ml-auto flex items-center gap-1">
+            {actions}
+            <span className="hidden px-2 text-sm text-white/85 sm:inline">{userLabel}</span>
             <Link
-              key={l.href}
-              href={l.href}
-              className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+              href="/password"
+              className="flex min-h-11 items-center rounded-xl px-3 text-sm font-medium hover:bg-white/15"
             >
-              {l.label}
+              Password
             </Link>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="hidden text-sm text-muted-foreground sm:inline">{userLabel}</span>
-          <Link
-            href="/password"
-            className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-          >
-            Password
-          </Link>
-          <form action={logout}>
-            <Button type="submit" variant="ghost" size="sm">
-              Esci
-            </Button>
-          </form>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="flex min-h-11 items-center rounded-xl px-3 text-sm font-medium hover:bg-white/15"
+              >
+                Esci
+              </button>
+            </form>
+          </div>
         </div>
+        <StaffNav links={links} />
       </div>
     </header>
   );

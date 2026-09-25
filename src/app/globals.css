@@ -39,6 +39,18 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-turquoise: var(--turquoise);
+  --color-sun: var(--sun);
+  --color-coral: var(--coral);
+  --color-done: var(--status-done);
+  --color-done-soft: var(--status-done-soft);
+  --color-done-text: var(--status-done-text);
+  --color-cancelled: var(--status-cancelled);
+  --color-cancelled-soft: var(--status-cancelled-soft);
+  --color-cancelled-text: var(--status-cancelled-text);
+  --color-scheduled: var(--status-scheduled);
+  --color-scheduled-soft: var(--status-scheduled-soft);
+  --color-scheduled-text: var(--status-scheduled-text);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +60,63 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Palette e token: vedi DESIGN.md (contrasti verificati WCAG AA). */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  --background: #f3f8ff;
+  --foreground: #0b1b33;
+  --card: #ffffff;
+  --card-foreground: #0b1b33;
+  --popover: #ffffff;
+  --popover-foreground: #0b1b33;
+  --primary: #0052cc;
+  --primary-foreground: #ffffff;
+  --secondary: #e3edff;
+  --secondary-foreground: #0b1b33;
+  --muted: #e8eef8;
+  --muted-foreground: #44546a;
+  --accent: #e3edff;
+  --accent-foreground: #0b1b33;
+  --destructive: #d42a1e;
+  --border: #c9d6ea;
+  --input: #b7c7df;
+  --ring: #0052cc;
+  --radius: 0.875rem;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Accenti: solo come sfondo con testo scuro */
+  --turquoise: #00b3c7;
+  --sun: #ffc700;
+  --coral: #ff5a4e;
+
+  /* Stati della lezione: pieno (testo bianco) e tenue (sfondo + testo) */
+  --status-done: #087f3a;
+  --status-done-soft: #e3f6ea;
+  --status-done-text: #077a37;
+  --status-cancelled: #d42a1e;
+  --status-cancelled-soft: #fde7e5;
+  --status-cancelled-text: #b3231a;
+  --status-scheduled: #0052cc;
+  --status-scheduled-soft: #e3edff;
+  --status-scheduled-text: #0052cc;
+
+  /* Livelli della classe (testo bianco) */
+  --level-asilo: #c0156a;
+  --level-elementari: #087f3a;
+  --level-medie: #0052cc;
+  --level-superiori: #7a2fe0;
+
+  --chart-1: #0052cc;
+  --chart-2: #087f3a;
+  --chart-3: #c2410c;
+  --chart-4: #7a2fe0;
+  --chart-5: #0b7285;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0b1b33;
+  --sidebar-primary: #0052cc;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e3edff;
+  --sidebar-accent-foreground: #0b1b33;
+  --sidebar-border: #c9d6ea;
+  --sidebar-ring: #0052cc;
 }
 
 @layer base {
