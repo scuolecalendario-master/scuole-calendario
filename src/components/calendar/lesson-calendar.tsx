@@ -108,7 +108,8 @@ export function LessonCalendar({
       const toOpen = pendingOpen.current && lessons.find((l) => l.id === pendingOpen.current);
       if (toOpen) {
         pendingOpen.current = undefined;
-        setDialog({ mode: "edit", lesson: toOpen });
+        // Il primo caricamento avviene mentre il calendario si sta montando
+        setTimeout(() => setDialog({ mode: "edit", lesson: toOpen }), 0);
       }
 
       return lessons.map((l) => {

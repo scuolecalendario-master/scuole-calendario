@@ -97,7 +97,7 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
         </h2>
         {next ? (
           <>
-            <p className="mt-1 text-3xl leading-tight font-bold capitalize sm:text-4xl">{formatDay(next.date)}</p>
+            <p className="mt-1 text-3xl leading-tight font-bold first-letter:uppercase sm:text-4xl">{formatDay(next.date)}</p>
             <p className="text-2xl font-bold tabular-nums">
               {formatTime(next.start_time)}–{formatTime(next.end_time)}
             </p>
@@ -122,7 +122,7 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
           <h2 className="text-xl font-bold">Calendario della classe</h2>
           {[...byMonth].map(([month, items]) => (
             <div key={month}>
-              <h3 className="mb-2 font-bold capitalize text-primary">{month}</h3>
+              <h3 className="mb-2 font-bold first-letter:uppercase text-primary">{month}</h3>
               <ul className="flex flex-col gap-2">
                 {items.map((l) => (
                   <li
@@ -134,7 +134,7 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
                     )}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className={cn("font-bold capitalize", l.status === "cancelled" && "line-through")}>
+                      <p className={cn("font-bold first-letter:uppercase", l.status === "cancelled" && "line-through")}>
                         {formatCompact(l.date)} · {formatTime(l.start_time)}–{formatTime(l.end_time)}
                       </p>
                       {l.status === "cancelled" && <StatusBadge status="cancelled" className="mt-1" />}
@@ -157,7 +157,7 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
             {past.map((l) => (
               <li key={l.id} className="rounded-2xl border-2 bg-card p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-bold capitalize">
+                  <p className="font-bold first-letter:uppercase">
                     {formatCompact(l.date)} · {formatTime(l.start_time)}
                   </p>
                   {l.status === "scheduled" ? (

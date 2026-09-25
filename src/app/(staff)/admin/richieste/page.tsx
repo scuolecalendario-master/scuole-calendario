@@ -49,7 +49,7 @@ export default async function RequestsPage() {
                 <span className="text-sm text-muted-foreground">{dateTime.format(new Date(r.created_at))}</span>
               </div>
               {r.lessons && (
-                <p className="font-semibold capitalize text-primary">
+                <p className="font-semibold first-letter:uppercase text-primary">
                   Lezione di {formatDay(r.lessons.date)}, {formatTime(r.lessons.start_time)}–{formatTime(r.lessons.end_time)}
                 </p>
               )}
@@ -60,7 +60,7 @@ export default async function RequestsPage() {
               {(r.proposed_date || r.proposed_time) && (
                 <p className="mb-3 font-medium">
                   Proposta:{" "}
-                  <span className="rounded-full bg-sun px-3 py-0.5 font-bold capitalize">
+                  <span className="rounded-full bg-sun px-3 py-0.5 font-bold first-letter:uppercase">
                     {r.proposed_date ? formatCompact(r.proposed_date) : ""}
                     {r.proposed_time ? ` · ${formatTime(r.proposed_time)}` : ""}
                   </span>
@@ -98,7 +98,7 @@ export default async function RequestsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">
                     {r.schools?.name} · {r.lessons?.classes?.grade_name} ·{" "}
-                    <span className="capitalize">{r.lessons ? formatCompact(r.lessons.date) : ""}</span>
+                    <span className="first-letter:uppercase">{r.lessons ? formatCompact(r.lessons.date) : ""}</span>
                   </p>
                   <p className="truncate text-muted-foreground">
                     {r.teacher_name}: {r.message}

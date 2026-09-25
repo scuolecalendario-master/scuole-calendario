@@ -85,13 +85,13 @@ function MonthRows({
   return (
     <>
       <tr className="break-inside-avoid">
-        <td colSpan={4} className="pt-3 pb-1 font-bold capitalize">
+        <td colSpan={4} className="pt-3 pb-1 font-bold first-letter:uppercase">
           {month}
         </td>
       </tr>
       {items.map((l) => (
         <tr key={l.id} className="break-inside-avoid border-b border-gray-400">
-          <td className={`py-1 pr-2 capitalize ${l.status === "cancelled" ? "line-through" : ""}`}>{formatDay(l.date)}</td>
+          <td className={`py-1 pr-2 first-letter:uppercase ${l.status === "cancelled" ? "line-through" : ""}`}>{formatDay(l.date)}</td>
           <td className="py-1 pr-2 tabular-nums">
             {formatTime(l.start_time)}–{formatTime(l.end_time)}
           </td>

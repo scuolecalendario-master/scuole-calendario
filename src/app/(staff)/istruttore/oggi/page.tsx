@@ -92,7 +92,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
           <ChevronLeft className="size-6" />
         </Link>
         <div className="text-center">
-          <h1 className="text-xl font-bold capitalize leading-tight">{formatDay(date)}</h1>
+          <h1 className="text-xl font-bold first-letter:uppercase leading-tight">{formatDay(date)}</h1>
           {date !== today ? (
             <Link href={href({ vista: vistaParam })} className="text-sm font-medium text-primary underline underline-offset-4">
               Torna a oggi

@@ -34,7 +34,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-bold capitalize">{formatDay(today)}</h1>
+      <h1 className="text-2xl font-bold first-letter:uppercase">{formatDay(today)}</h1>
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Richieste di spostamento */}
@@ -54,7 +54,7 @@ export default async function AdminDashboard() {
                 <li key={r.id} className="rounded-xl bg-muted p-3 text-sm">
                   <p className="font-semibold">
                     {r.schools?.name} · {r.lessons?.classes?.grade_name}{" "}
-                    <span className="capitalize">{r.lessons ? `(${formatCompact(r.lessons.date)})` : ""}</span>
+                    <span className="first-letter:uppercase">{r.lessons ? `(${formatCompact(r.lessons.date)})` : ""}</span>
                   </p>
                   <p className="line-clamp-2 text-muted-foreground">{r.message}</p>
                 </li>
@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
                           href={`/admin/calendario?data=${l.date}&lezione=${l.id}`}
                           className="flex min-h-9 items-center gap-2 rounded-lg px-2 hover:bg-muted"
                         >
-                          <span className="font-medium capitalize">{formatCompact(l.date)}</span>
+                          <span className="font-medium whitespace-nowrap">{formatCompact(l.date)}</span>
                           <span className="tabular-nums">{formatTime(l.start_time)}</span>
                           <span className="truncate text-muted-foreground">
                             {l.classes?.grade_name} · {l.schools?.name}

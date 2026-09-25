@@ -264,7 +264,7 @@ export function CourseForm({ schools }: { schools: School[] }) {
             <div className="flex flex-col gap-3">
               {[...byMonth].map(([month, ds]) => (
                 <div key={month}>
-                  <p className="mb-1 font-semibold capitalize">{month}</p>
+                  <p className="mb-1 font-semibold first-letter:uppercase">{month}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {ds.map((d) => {
                       const clash = overlapping.has(d);
@@ -278,7 +278,7 @@ export function CourseForm({ schools }: { schools: School[] }) {
                           onClick={() => toggleDate(d)}
                           title={clash ? "Esiste già una lezione a quest'ora" : undefined}
                           className={cn(
-                            "min-h-11 rounded-xl border-2 px-3 text-sm font-semibold capitalize",
+                            "min-h-11 rounded-xl border-2 px-3 text-sm font-semibold first-letter:uppercase",
                             clash
                               ? "border-dashed border-sun bg-sun/20 text-foreground"
                               : off

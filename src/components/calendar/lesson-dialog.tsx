@@ -96,7 +96,7 @@ function LessonDetails({
         <DialogTitle>
           {l.schools?.name} · Classe {l.classes?.grade_name}
         </DialogTitle>
-        <DialogDescription className="capitalize">
+        <DialogDescription className="first-letter:uppercase">
           {formatDay(l.date)}, {formatTime(l.start_time)}–{formatTime(l.end_time)}
         </DialogDescription>
       </DialogHeader>

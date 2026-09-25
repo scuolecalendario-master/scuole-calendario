@@ -52,7 +52,7 @@ export default async function BackupPage() {
           {backups.map((b, i) => (
             <li key={b.name} className="flex items-center gap-3 rounded-2xl border-2 bg-card p-3">
               <div className="min-w-0 flex-1">
-                <p className="font-semibold capitalize">
+                <p className="font-semibold first-letter:uppercase">
                   {b.createdAt ? dateTime.format(new Date(b.createdAt)) : b.name}
                   {i === 0 && <span className="ml-2 rounded-full bg-done-soft px-2 py-0.5 text-xs font-bold text-done-text normal-case">più recente</span>}
                 </p>

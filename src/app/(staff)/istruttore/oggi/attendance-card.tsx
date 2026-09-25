@@ -78,7 +78,7 @@ export function AttendanceCard({
     <li className={cn("rounded-2xl border-2 bg-card p-4", cancelled && "opacity-70", done && "border-done/40")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {showDate && <p className="text-sm font-semibold capitalize text-primary">{formatDay(lesson.date)}</p>}
+          {showDate && <p className="text-sm font-semibold first-letter:uppercase text-primary">{formatDay(lesson.date)}</p>}
           <p className="text-2xl font-bold tabular-nums">
             {formatTime(lesson.start_time)}–{formatTime(lesson.end_time)}
           </p>
