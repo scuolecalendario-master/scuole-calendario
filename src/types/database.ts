@@ -14,26 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      change_requests: {
+        Row: {
+          created_at: string
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          lesson_id: string
+          message: string
+          proposed_date: string | null
+          proposed_time: string | null
+          school_id: string
+          teacher_name: string
+        }
+        Insert: {
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          lesson_id: string
+          message: string
+          proposed_date?: string | null
+          proposed_time?: string | null
+          school_id: string
+          teacher_name: string
+        }
+        Update: {
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          lesson_id?: string
+          message?: string
+          proposed_date?: string | null
+          proposed_time?: string | null
+          school_id?: string
+          teacher_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "change_requests_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "change_requests_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "change_requests_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_instructors: {
+        Row: {
+          class_id: string
+          created_at: string
+          profile_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          profile_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_instructors_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_instructors_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classes: {
         Row: {
           created_at: string
           grade_name: string
           id: string
+          level: Database["public"]["Enums"]["school_level"]
           school_id: string
+          site_id: string | null
           total_enrolled: number
         }
         Insert: {
           created_at?: string
           grade_name: string
           id?: string
+          level?: Database["public"]["Enums"]["school_level"]
           school_id: string
+          site_id?: string | null
           total_enrolled?: number
         }
         Update: {
           created_at?: string
           grade_name?: string
           id?: string
+          level?: Database["public"]["Enums"]["school_level"]
           school_id?: string
+          site_id?: string | null
           total_enrolled?: number
         }
         Relationships: [
@@ -42,6 +142,13 @@ export type Database = {
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classes_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -53,6 +160,8 @@ export type Database = {
           created_at: string
           date: string
           end_time: string
+          focus: string[]
+          focus_note: string | null
           id: string
           instructor_id: string | null
           notes: string | null
@@ -67,6 +176,8 @@ export type Database = {
           created_at?: string
           date: string
           end_time: string
+          focus?: string[]
+          focus_note?: string | null
           id?: string
           instructor_id?: string | null
           notes?: string | null
@@ -81,6 +192,8 @@ export type Database = {
           created_at?: string
           date?: string
           end_time?: string
+          focus?: string[]
+          focus_note?: string | null
           id?: string
           instructor_id?: string | null
           notes?: string | null
@@ -139,6 +252,44 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"] | null
         }
         Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          profile_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          profile_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          profile_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       registration_codes: {
         Row: {
@@ -215,6 +366,35 @@ export type Database = {
         }
         Relationships: []
       }
+      sites: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          school_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          school_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          school_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sites_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -224,9 +404,18 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      can_request_change: {
+        Args: { p_lesson_id: string; p_school_id: string }
+        Returns: boolean
+      }
       check_registration_code: { Args: { p_code: string }; Returns: boolean }
+      focus_catalog: {
+        Args: { p_level: Database["public"]["Enums"]["school_level"] }
+        Returns: string[]
+      }
       generate_registration_code: { Args: never; Returns: string }
       generate_school_code: { Args: { school_name: string }; Returns: string }
+      is_class_instructor: { Args: { p_class_id: string }; Returns: boolean }
       lesson_report: {
         Args: { p_from: string; p_school_id?: string; p_to: string }
         Returns: {
@@ -253,6 +442,7 @@ export type Database = {
     }
     Enums: {
       lesson_status: "scheduled" | "done" | "cancelled"
+      school_level: "asilo" | "elementari" | "medie" | "superiori"
       user_role: "master" | "instructor"
     }
     CompositeTypes: {
@@ -382,6 +572,7 @@ export const Constants = {
   public: {
     Enums: {
       lesson_status: ["scheduled", "done", "cancelled"],
+      school_level: ["asilo", "elementari", "medie", "superiori"],
       user_role: ["master", "instructor"],
     },
   },
