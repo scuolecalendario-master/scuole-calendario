@@ -268,7 +268,7 @@ function LessonForm({
           <p className="text-sm text-muted-foreground sm:col-span-2">
             Per un corso che si ripete ogni settimana usa{" "}
             <Link href="/admin/programma" className="font-semibold text-primary underline">
-              Programma
+              Corsi
             </Link>
             .
           </p>

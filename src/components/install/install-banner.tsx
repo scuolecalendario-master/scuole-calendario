@@ -69,7 +69,7 @@ export function InstallBanner({ text, className }: { text: string; className?: s
           className,
         )}
       >
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+        <span className="hidden size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground min-[400px]:flex">
           <Smartphone className="size-5" aria-hidden />
         </span>
         <p className="min-w-0 flex-1 text-sm font-medium">{text}</p>

@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Richieste di spostamento */}
-        <section className="flex flex-col gap-3 rounded-3xl border-2 border-coral bg-card p-4">
+        <section className="flex min-w-0 flex-col gap-3 rounded-3xl border-2 border-coral bg-card p-4">
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <span className="flex size-10 items-center justify-center rounded-xl bg-coral">
               <Bell className="size-5 text-foreground" aria-hidden />
@@ -68,7 +68,7 @@ export default async function AdminDashboard() {
         </section>
 
         {/* Lezioni da registrare */}
-        <section className="flex flex-col gap-3 rounded-3xl border-2 border-sun bg-card p-4">
+        <section className="flex min-w-0 flex-col gap-3 rounded-3xl border-2 border-sun bg-card p-4">
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <span className="flex size-10 items-center justify-center rounded-xl bg-sun">
               <ClipboardCheck className="size-5 text-foreground" aria-hidden />
@@ -109,7 +109,7 @@ export default async function AdminDashboard() {
         </section>
 
         {/* Lezioni di oggi */}
-        <section className="flex flex-col gap-3 rounded-3xl border-2 border-turquoise bg-card p-4">
+        <section className="flex min-w-0 flex-col gap-3 rounded-3xl border-2 border-turquoise bg-card p-4">
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <span className="flex size-10 items-center justify-center rounded-xl bg-turquoise">
               <Waves className="size-5 text-foreground" aria-hidden />

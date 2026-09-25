@@ -11,7 +11,21 @@ type Status = "loading" | "unsupported" | "ios-install" | "denied" | "off" | "on
 function urlBase64ToUint8Array(base64: string) {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
   const raw = atob((base64 + padding).replace(/-/g, "+").replace(/_/g, "/"));
-  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0)) as Uint8Array<ArrayBuffer>;
+}
+
+// Inserita a build time da Next.js; tolti spazi e virgolette copiati per errore
+const VAPID_PUBLIC_KEY = (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+
+function describe(e: unknown) {
+  return e instanceof Error ? `${e.name}: ${e.message}` : String(e);
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number) {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("tempo scaduto")), ms)),
+  ]);
 }
 
 function isIos() {
@@ -49,28 +63,60 @@ export function NotificationsToggle() {
   function enable() {
     setMessage(undefined);
     startTransition(async () => {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") {
-          setStatus(permission === "denied" ? "denied" : "off");
-          return;
-        }
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
-        });
-        const result = await savePushSubscription(JSON.parse(JSON.stringify(sub)), navigator.userAgent);
-        if (result.error) {
-          await sub.unsubscribe();
-          setMessage(result.error);
-          return;
-        }
-        setStatus("on");
-        setMessage("Notifiche attive su questo dispositivo.");
-      } catch {
-        setMessage("Non è stato possibile attivare le notifiche su questo browser.");
+      // Ogni passaggio ha il suo messaggio: così si capisce subito cosa non va
+      const key = VAPID_PUBLIC_KEY;
+      if (!key) {
+        setMessage(
+          "Notifiche non configurate sul server: manca NEXT_PUBLIC_VAPID_PUBLIC_KEY su Vercel (poi serve un nuovo deploy).",
+        );
+        return;
       }
+      let applicationServerKey: Uint8Array<ArrayBuffer>;
+      try {
+        applicationServerKey = urlBase64ToUint8Array(key);
+        if (applicationServerKey.length !== 65) throw new Error("lunghezza");
+      } catch {
+        setMessage("La chiave NEXT_PUBLIC_VAPID_PUBLIC_KEY su Vercel non è valida: ricopiala senza spazi né virgolette.");
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        setStatus(permission === "denied" ? "denied" : "off");
+        return;
+      }
+
+      let reg: ServiceWorkerRegistration;
+      try {
+        await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
+        reg = await withTimeout(navigator.serviceWorker.ready, 10_000);
+      } catch (e) {
+        setMessage(`Il servizio per le notifiche non si è avviato (${describe(e)}). Ricarica la pagina e riprova.`);
+        return;
+      }
+
+      let sub: PushSubscription;
+      try {
+        // Una sottoscrizione vecchia (es. creata con un'altra chiave) va rimossa prima
+        const old = await reg.pushManager.getSubscription();
+        if (old) await old.unsubscribe();
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+      } catch (e) {
+        setMessage(
+          `Il browser non riesce a registrarsi al servizio notifiche (${describe(e)}). ` +
+            "Su Android usa Chrome o Samsung Internet aggiornati; in Brave attiva “Usa i servizi Google per la messaggistica push”.",
+        );
+        return;
+      }
+
+      const result = await savePushSubscription(JSON.parse(JSON.stringify(sub)), navigator.userAgent);
+      if (result.error) {
+        await sub.unsubscribe();
+        setMessage(result.error);
+        return;
+      }
+      setStatus("on");
+      setMessage("Notifiche attive su questo dispositivo. Premi “Invia prova” per verificare.");
     });
   }
 
@@ -113,7 +159,7 @@ export function NotificationsToggle() {
         </div>
       )}
       {status === "off" && (
-        <Button onClick={enable} disabled={pending} className="h-12 self-start px-5 text-base">
+        <Button onClick={enable} disabled={pending} className="h-auto min-h-12 self-start px-5 py-2 text-left text-base whitespace-normal">
           <Bell className="size-5" aria-hidden />
           {pending ? "Attivazione…" : "Attiva notifiche su questo dispositivo"}
         </Button>

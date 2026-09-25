@@ -72,7 +72,7 @@ export default async function StaffPage() {
           {staff?.map((p) => {
             const classes = p.class_instructors.map((ci) => ci.classes).filter((c) => c !== null);
             return (
-              <li key={p.id} className="flex flex-col gap-3 rounded-2xl border-2 bg-card p-4">
+              <li key={p.id} className="flex min-w-0 flex-col gap-3 rounded-2xl border-2 bg-card p-4">
                 <div className="flex items-start gap-3">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary">
                     <UserRound className="size-6 text-primary" aria-hidden />

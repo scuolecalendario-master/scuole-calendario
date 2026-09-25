@@ -13,12 +13,25 @@ export type PushPayload = {
   tag?: string;
 };
 
+/** Valore di una variabile d'ambiente senza spazi o virgolette copiati per errore. */
+function env(name: string) {
+  return (process.env[name] ?? "").trim().replace(/^["']|["']$/g, "");
+}
+
 function configure() {
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const privateKey = process.env.VAPID_PRIVATE_KEY;
-  if (!publicKey || !privateKey) return false;
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT ?? "mailto:admin@example.com", publicKey, privateKey);
-  return true;
+  const publicKey = env("NEXT_PUBLIC_VAPID_PUBLIC_KEY");
+  const privateKey = env("VAPID_PRIVATE_KEY");
+  if (!publicKey || !privateKey) {
+    console.error("[push] chiavi VAPID mancanti");
+    return false;
+  }
+  try {
+    webpush.setVapidDetails(env("VAPID_SUBJECT") || "mailto:admin@example.com", publicKey, privateKey);
+    return true;
+  } catch (e) {
+    console.error("[push] chiavi VAPID non valide", e);
+    return false;
+  }
 }
 
 type Target = { role: "master" } | { profileId: string };

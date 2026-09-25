@@ -19,7 +19,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         links={[
           { href: "/admin", label: "Oggi", exact: true, badge: toRecord },
           { href: "/admin/calendario", label: "Calendario" },
-          { href: "/admin/programma", label: "Programma" },
+          { href: "/admin/programma", label: "Corsi" },
           { href: "/admin/richieste", label: "Richieste", badge: openRequests },
           { href: "/admin/scuole", label: "Istituti" },
           { href: "/admin/istruttori", label: "Istruttori" },

@@ -53,6 +53,9 @@ export async function removePushSubscription(endpoint: string) {
 
 export async function sendTestPush() {
   const me = await requireRole("master");
+  if (!process.env.VAPID_PRIVATE_KEY?.trim()) {
+    return { error: "Manca VAPID_PRIVATE_KEY nelle variabili d'ambiente di Vercel (poi serve un nuovo deploy)." };
+  }
   const delivered = await notifyProfile(me.id, {
     title: "Notifiche attive ✓",
     body: "Riceverai qui le richieste di spostamento delle scuole.",
