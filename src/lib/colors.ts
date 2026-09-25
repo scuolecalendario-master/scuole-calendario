@@ -15,3 +15,26 @@ export function stableColor(id: string) {
 
 export const schoolColor = stableColor;
 export const classColor = stableColor;
+
+/**
+ * Classi Tailwind per livello (statiche, così Tailwind le genera).
+ * `solid`: sfondo pieno con testo bianco; `checked`: stile di un chip selezionato.
+ */
+export const LEVEL_STYLE = {
+  asilo: {
+    solid: "bg-level-asilo text-white",
+    checked: "has-checked:border-level-asilo has-checked:bg-level-asilo has-checked:text-white",
+  },
+  elementari: {
+    solid: "bg-level-elementari text-white",
+    checked: "has-checked:border-level-elementari has-checked:bg-level-elementari has-checked:text-white",
+  },
+  medie: {
+    solid: "bg-level-medie text-white",
+    checked: "has-checked:border-level-medie has-checked:bg-level-medie has-checked:text-white",
+  },
+  superiori: {
+    solid: "bg-level-superiori text-white",
+    checked: "has-checked:border-level-superiori has-checked:bg-level-superiori has-checked:text-white",
+  },
+} as const;

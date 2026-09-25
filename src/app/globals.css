@@ -51,6 +51,10 @@
   --color-scheduled: var(--status-scheduled);
   --color-scheduled-soft: var(--status-scheduled-soft);
   --color-scheduled-text: var(--status-scheduled-text);
+  --color-level-asilo: var(--level-asilo);
+  --color-level-elementari: var(--level-elementari);
+  --color-level-medie: var(--level-medie);
+  --color-level-superiori: var(--level-superiori);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

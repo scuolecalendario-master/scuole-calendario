@@ -4,58 +4,66 @@ import { revalidatePath } from "next/cache";
 
 import { requireRole } from "@/lib/auth";
 import { todayISO } from "@/lib/dates";
+import { focusCatalog, sanitizeFocus } from "@/lib/focus";
 import { dbErrorMessage } from "@/lib/forms";
 import { createClient } from "@/lib/supabase/server";
-import type { Enums } from "@/types/database";
 
 export type RecordInput = {
-  status: Enums<"lesson_status">;
+  /** true = lezione svolta, false = torna "programmata". */
+  done: boolean;
   attendeesCount: number | null;
-  notes: string | null;
+  focus: string[];
+  /** Testo per "Gioco con…". */
+  focusNote: string | null;
 };
 
-const STATUSES: Enums<"lesson_status">[] = ["scheduled", "done", "cancelled"];
-
 /**
- * Registra l'esito di una lezione a bordo vasca: stato, presenti e note.
- * Se la lezione non ha un istruttore, viene assegnata a chi la registra.
+ * Registrazione a bordo vasca: SOLO svolta, presenti e focus.
+ * Il database applica le stesse regole (trigger lessons_before_write + RLS):
+ * solo gli istruttori della classe, niente annullamento né note.
  */
 export async function recordLesson(lessonId: string, input: RecordInput): Promise<{ error?: string }> {
   const me = await requireRole("instructor", "master");
-
   if (!/^[0-9a-f-]{36}$/i.test(lessonId)) return { error: "Lezione non valida." };
-  if (!STATUSES.includes(input.status)) return { error: "Stato non valido." };
-
-  const attendees = input.status === "done" ? input.attendeesCount : null;
-  if (input.status === "done") {
-    if (attendees === null || !Number.isInteger(attendees) || attendees < 0) {
-      return { error: "Indica quanti bambini erano presenti." };
-    }
-  }
 
   const supabase = await createClient();
   const { data: lesson } = await supabase
     .from("lessons")
-    .select("date, instructor_id")
+    .select("date, status, instructor_id, classes(level, total_enrolled)")
     .eq("id", lessonId)
     .maybeSingle();
-  if (!lesson) return { error: "Lezione non trovata." };
-  if (input.status === "done" && lesson.date > todayISO()) {
-    return { error: "Una lezione futura non può essere segnata come svolta." };
+  if (!lesson?.classes) return { error: "Lezione non trovata." };
+  if (lesson.status === "cancelled") return { error: "La lezione è stata annullata." };
+
+  let update;
+  if (input.done) {
+    if (lesson.date > todayISO()) return { error: "Una lezione futura non può essere segnata come svolta." };
+    const n = input.attendeesCount;
+    if (n === null || !Number.isInteger(n) || n < 0) return { error: "Indica quanti bambini erano presenti." };
+    if (n > lesson.classes.total_enrolled) {
+      return { error: `I presenti non possono superare gli iscritti (${lesson.classes.total_enrolled}).` };
+    }
+    const focus = sanitizeFocus(lesson.classes.level, input.focus);
+    const needsNote = focus.some((id) => focusCatalog(lesson.classes!.level).find((f) => f.id === id)?.withNote);
+    update = {
+      status: "done" as const,
+      attendees_count: n,
+      focus,
+      focus_note: needsNote ? input.focusNote?.trim().slice(0, 200) || null : null,
+      // Chi registra una lezione senza istruttore la prende in carico
+      ...(lesson.instructor_id === null && me.role === "instructor" ? { instructor_id: me.id } : {}),
+    };
+  } else {
+    update = { status: "scheduled" as const };
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("lessons")
-    .update({
-      status: input.status,
-      attendees_count: attendees,
-      notes: input.notes?.trim().slice(0, 1000) || null,
-      ...(lesson.instructor_id === null && input.status !== "scheduled"
-        ? { instructor_id: me.id }
-        : {}),
-    })
-    .eq("id", lessonId);
+    .update(update)
+    .eq("id", lessonId)
+    .select("id");
   if (error) return { error: dbErrorMessage(error) };
+  if (!updated?.length) return { error: "Non sei tra gli istruttori di questa classe." };
 
   revalidatePath("/istruttore", "layout");
   revalidatePath("/admin", "layout");
