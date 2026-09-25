@@ -117,8 +117,14 @@ export async function deleteSchool(schoolId: string) {
 
 // ---------- Classi ----------
 
-export async function createClass(schoolId: string, _prev: ActionState, formData: FormData) {
-  return handleForm(async () => {
+/** Crea una classe; restituisce anche `classId` (usato dal modulo "Programma"). */
+export async function createClass(
+  schoolId: string,
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState & { classId?: string }> {
+  let classId: string | undefined;
+  const state = await handleForm(async () => {
     await requireRole("master");
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -128,9 +134,12 @@ export async function createClass(schoolId: string, _prev: ActionState, formData
       .single();
     if (error) throw new FormError(dbErrorMessage(error, { unique: CLASS_UNIQUE }));
     await syncInstructors(supabase, data.id, readInstructors(formData));
+    classId = data.id;
     revalidatePath(`/admin/scuole/${schoolId}`);
+    revalidatePath("/admin/programma");
     return { success: "Classe aggiunta." };
   });
+  return { ...state, classId };
 }
 
 export async function updateClass(classId: string, _prev: ActionState, formData: FormData) {

@@ -158,3 +158,61 @@ export async function deleteLesson(lessonId: string) {
     return done();
   });
 }
+
+// ---------- Corso settimanale ("Programma") ----------
+
+const MAX_COURSE_LESSONS = 120;
+
+/**
+ * Crea tutte le lezioni di un corso in una sola volta. Le date arrivano già
+ * calcolate dal client (giorni scelti, periodo, esclusioni) e vengono rivalidate.
+ */
+export async function createCourse(input: {
+  classId: string;
+  startTime: string;
+  endTime: string;
+  dates: string[];
+}): Promise<LessonActionResult> {
+  return run(async () => {
+    await requireRole("master");
+    const dates = [...new Set(input.dates)].filter(isISODate).sort();
+    if (dates.length === 0) throw new InputError("Nessuna data selezionata.");
+    if (dates.length > MAX_COURSE_LESSONS) {
+      throw new InputError(`Massimo ${MAX_COURSE_LESSONS} lezioni per volta.`);
+    }
+    const row = validate({
+      classId: input.classId,
+      instructorId: null,
+      date: dates[0],
+      startTime: input.startTime,
+      endTime: input.endTime,
+      notes: null,
+    });
+
+    const supabase = await createClient();
+    const { data: cls } = await supabase.from("classes").select("school_id").eq("id", row.class_id).maybeSingle();
+    if (!cls) throw new InputError("Classe inesistente.");
+
+    const { error } = await supabase
+      .from("lessons")
+      .insert(dates.map((date) => ({ ...row, date, school_id: cls.school_id })));
+    if (error) return { error: dbErrorMessage(error) };
+    return done(dates.length);
+  });
+}
+
+/** Lezioni già presenti per la classe nel periodo (per segnalare sovrapposizioni). */
+export async function getClassLessons(classId: string, from: string, to: string) {
+  await requireRole("master");
+  if (!UUID.test(classId) || !isISODate(from) || !isISODate(to)) return [];
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("lessons")
+    .select("date, start_time, end_time")
+    .eq("class_id", classId)
+    .gte("date", from)
+    .lte("date", to)
+    .neq("status", "cancelled")
+    .limit(500);
+  return data ?? [];
+}
