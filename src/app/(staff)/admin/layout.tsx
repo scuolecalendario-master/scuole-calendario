@@ -11,7 +11,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         links={[
           { href: "/admin/calendario", label: "Calendario" },
           { href: "/admin/report", label: "Report" },
-          { href: "/admin/scuole", label: "Scuole" },
+          { href: "/admin/scuole", label: "Istituti" },
           { href: "/admin/istruttori", label: "Istruttori" },
         ]}
         userLabel={profile.full_name ?? profile.email ?? ""}

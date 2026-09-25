@@ -22,13 +22,13 @@ export function SchoolForm({
   return (
     <form action={formAction} className="grid gap-3 sm:grid-cols-[2fr_2fr_auto] sm:items-end">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Nome scuola</Label>
+        <Label htmlFor="name">Nome istituto</Label>
         <Input
           key={defaults?.name}
           id="name"
           name="name"
           defaultValue={defaults?.name}
-          placeholder="Es. Scuola Primaria Manzoni"
+          placeholder="Es. Istituto Comprensivo Manzoni"
           maxLength={120}
           required
         />

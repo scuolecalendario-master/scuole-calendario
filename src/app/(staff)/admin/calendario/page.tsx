@@ -13,9 +13,9 @@ export default async function AdminCalendarPage() {
       <h1 className="text-2xl font-bold">Calendario</h1>
       {schools.every((s) => s.classes.length === 0) ? (
         <p className="text-muted-foreground">
-          Per programmare le lezioni crea prima una scuola con almeno una classe in{" "}
+          Per programmare le lezioni crea prima un istituto con almeno una classe in{" "}
           <Link href="/admin/scuole" className="underline underline-offset-4">
-            Scuole
+            Istituti
           </Link>
           .
         </p>
