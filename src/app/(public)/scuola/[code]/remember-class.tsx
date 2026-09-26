@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const key = (code: string) => `classe:${code}`;
 /** Ultimo istituto visitato: la home "/" (anche dall'app sulla schermata Home) lo riapre. */
-export const LAST_SCHOOL_KEY = "ultima-scuola";
+const LAST_SCHOOL_KEY = "ultima-scuola";
 
 /** Nella pagina della classe: la ricorda. */
 export function RememberClass({ code, classId }: { code: string; classId: string }) {

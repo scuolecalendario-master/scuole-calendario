@@ -3,6 +3,7 @@ import "server-only";
 import { notFound } from "next/navigation";
 
 import { createSchoolClient, isValidSchoolCode, normalizeSchoolCode } from "@/lib/supabase/server";
+import { orThrow } from "@/lib/db";
 
 export const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -12,7 +13,8 @@ export async function getPortalSchool(rawCode: string) {
   if (!isValidSchoolCode(code)) notFound();
 
   const supabase = createSchoolClient(code);
-  const { data: school } = await supabase.from("schools").select("id, name, change_requests_enabled").maybeSingle();
+  // Errore del database ≠ codice sbagliato: il primo mostra "Riprova"
+  const school = orThrow(await supabase.from("schools").select("id, name, change_requests_enabled").maybeSingle());
   if (!school) notFound();
 
   return { code, school, supabase };

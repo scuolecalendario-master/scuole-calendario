@@ -31,6 +31,8 @@ export type CalendarLesson = {
   class_id: string;
   school_id: string;
   instructor_id: string | null;
+  /** Per accorgersi se la lezione è cambiata mentre il dialog era aperto. */
+  updated_at: string;
   classes: { grade_name: string; total_enrolled: number; level: Enums<"school_level"> } | null;
   schools: { name: string } | null;
 };

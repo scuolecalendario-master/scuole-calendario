@@ -7,6 +7,7 @@ import { addDays, formatDay, formatMonth, formatTime, startOfSchoolYear, todayIS
 import { focusLabel, LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool, UUID } from "@/lib/portal";
 import { BrandMark } from "@/components/brand";
+import { orThrow } from "@/lib/db";
 import { AutoPrint } from "./auto-print";
 
 export const metadata: Metadata = { title: "Calendario da stampare", robots: { index: false, follow: false } };
@@ -17,22 +18,30 @@ export default async function PrintClassPage({ params }: PageProps<"/scuola/[cod
   if (!UUID.test(classId)) notFound();
   const { code, school, supabase } = await getPortalSchool(rawCode);
 
-  const yearStart = startOfSchoolYear(todayISO());
-  const [{ data: cls }, { data: lessons }] = await Promise.all([
+  const today = todayISO();
+  const yearStart = startOfSchoolYear(today);
+  const [clsRes, lessonsRes] = await Promise.all([
     supabase.from("classes").select("id, grade_name, level, sites(name)").eq("id", classId).maybeSingle(),
     supabase
       .from("lessons")
       .select("id, date, start_time, end_time, status, focus, focus_note")
       .eq("class_id", classId)
       .gte("date", yearStart)
-      .lt("date", addDays(yearStart, 366))
+      // un anno avanti da oggi: d'estate compaiono già le lezioni di settembre
+      .lt("date", addDays(today, 366))
       .order("date")
       .order("start_time"),
   ]);
+  const [cls, lessons] = [orThrow(clsRes), orThrow(lessonsRes)];
   if (!cls) notFound();
 
   const byMonth = Map.groupBy(lessons ?? [], (l) => formatMonth(l.date));
-  const schoolYear = `${yearStart.slice(0, 4)}/${Number(yearStart.slice(0, 4)) + 1}`;
+  const yearLabel = (date: string) => {
+    const y = Number(startOfSchoolYear(date).slice(0, 4));
+    return `${y}/${y + 1}`;
+  };
+  const years = [...new Set([yearStart, ...(lessons ?? []).map((l) => l.date)].map(yearLabel))];
+  const schoolYear = years.join(" e ");
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 bg-white px-4 py-6 text-black print:max-w-none print:p-0">

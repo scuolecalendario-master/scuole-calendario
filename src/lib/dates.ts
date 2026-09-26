@@ -23,12 +23,6 @@ export function addDays(date: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Lunedì della settimana che contiene `date`. */
-export function startOfWeek(date: string): string {
-  const dow = (toUTC(date).getUTCDay() + 6) % 7; // 0 = lunedì
-  return addDays(date, -dow);
-}
-
 /** 1 settembre dell'anno scolastico in corso. */
 export function startOfSchoolYear(date: string): string {
   const [y, m] = date.split("-").map(Number);
@@ -41,15 +35,9 @@ const dayFormat = new Intl.DateTimeFormat("it-IT", {
   month: "long",
   timeZone: "UTC",
 });
-const shortFormat = new Intl.DateTimeFormat("it-IT", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
 const numericFormat = new Intl.DateTimeFormat("it-IT", { timeZone: "UTC" });
 
 export const formatDay = (date: string) => dayFormat.format(toUTC(date));
-export const formatShort = (date: string) => shortFormat.format(toUTC(date));
 export const formatDate = (date: string) => numericFormat.format(toUTC(date));
 export const formatTime = (time: string) => time.slice(0, 5);
 
@@ -64,7 +52,7 @@ export function nowTimeRome(): string {
 }
 
 /** Giorni tra due date "YYYY-MM-DD" (b − a). */
-export function daysBetween(a: string, b: string): number {
+function daysBetween(a: string, b: string): number {
   return Math.round((toUTC(b).getTime() - toUTC(a).getTime()) / 86_400_000);
 }
 

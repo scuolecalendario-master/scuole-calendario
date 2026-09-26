@@ -10,15 +10,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
+import { orThrow } from "@/lib/db";
 import { createSchool } from "./actions";
 import { SchoolForm } from "./school-form";
 
 export default async function SchoolsPage() {
   const supabase = await createClient();
-  const { data: schools } = await supabase
-    .from("schools")
-    .select("id, name, unique_code, contact_email, change_requests_enabled, sites(count), classes(total_enrolled)")
-    .order("name");
+  const schools = orThrow(
+    await supabase
+      .from("schools")
+      .select("id, name, unique_code, contact_email, change_requests_enabled, sites(count), classes(total_enrolled)")
+      .order("name"),
+  );
 
   return (
     <div className="flex flex-col gap-6">

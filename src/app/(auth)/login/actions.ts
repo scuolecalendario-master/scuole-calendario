@@ -17,11 +17,15 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   });
   if (error) return { error: "Email o password non corretti.", email };
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role, must_change_password")
     .eq("id", data.user.id)
     .maybeSingle();
+  if (profileError) {
+    await supabase.auth.signOut();
+    return { error: "Collegamento non riuscito: riprova tra poco.", email };
+  }
 
   if (!profile?.role) {
     await supabase.auth.signOut();

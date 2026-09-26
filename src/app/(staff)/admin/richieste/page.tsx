@@ -5,6 +5,7 @@ import { NotificationsToggle } from "@/components/notifications-toggle";
 import { getOpenRequests } from "@/lib/admin-stats";
 import { formatCompact, formatDay, formatTime } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
+import { orThrow } from "@/lib/db";
 import { setRequestHandled } from "./actions";
 
 const dateTime = new Intl.DateTimeFormat("it-IT", {
@@ -17,14 +18,15 @@ const dateTime = new Intl.DateTimeFormat("it-IT", {
 
 export default async function RequestsPage() {
   const supabase = await createClient();
-  const [open, { data: handled }] = await Promise.all([
+  const [open, handled] = await Promise.all([
     getOpenRequests(),
     supabase
       .from("change_requests")
       .select("id, teacher_name, message, handled_at, schools(name), lessons(date, start_time, classes(grade_name))")
       .not("handled_at", "is", null)
       .order("handled_at", { ascending: false })
-      .limit(20),
+      .limit(20)
+      .then(orThrow),
   ]);
 
   return (

@@ -33,7 +33,7 @@ const PAGE = 1000; // limite righe per richiesta di PostgREST
 const DEFAULT_DURATION_MIN = 45;
 
 const LESSON_COLUMNS =
-  "id, date, start_time, end_time, status, attendees_count, focus, focus_note, notes, class_id, school_id, instructor_id, classes(grade_name, total_enrolled, level), schools(name)";
+  "id, date, start_time, end_time, status, attendees_count, focus, focus_note, notes, class_id, school_id, instructor_id, updated_at, classes(grade_name, total_enrolled, level), schools(name)";
 
 /** "2026-09-24T09:00:00+02:00" → { date: "2026-09-24", time: "09:00" } (già nel fuso del calendario) */
 function splitStr(str: string) {

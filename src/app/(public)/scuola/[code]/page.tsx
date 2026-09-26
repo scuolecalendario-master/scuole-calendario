@@ -8,6 +8,7 @@ import { LEVEL_LABEL } from "@/lib/focus";
 import { getPortalSchool } from "@/lib/portal";
 import { HomeLogo } from "@/components/brand";
 import { InstallBanner } from "@/components/install/install-banner";
+import { orThrow } from "@/lib/db";
 import { OpenRememberedClass } from "./remember-class";
 
 // Il codice è una credenziale: la pagina non va indicizzata.
@@ -17,11 +18,12 @@ export default async function SchoolPortalPage({ params, searchParams }: PagePro
   const { code, school, supabase } = await getPortalSchool((await params).code);
   const { scegli } = await searchParams;
 
-  const [{ data: sites }, { data: classes }, { data: next }] = await Promise.all([
+  const [sitesRes, classesRes, nextRes] = await Promise.all([
     supabase.from("sites").select("id, name").order("name"),
     supabase.from("classes").select("id, grade_name, level, site_id").order("grade_name"),
     supabase.rpc("next_lessons"),
   ]);
+  const [sites, classes, next] = [orThrow(sitesRes), orThrow(classesRes), orThrow(nextRes)];
 
   const nextByClass = new Map((next ?? []).map((n) => [n.class_id, n]));
   const allClasses = classes ?? [];

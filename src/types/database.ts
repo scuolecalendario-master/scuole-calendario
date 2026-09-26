@@ -462,6 +462,7 @@ export type Database = {
       }
       regenerate_school_code: { Args: { p_school_id: string }; Returns: string }
       request_school_id: { Args: never; Returns: string }
+      shares_class_with: { Args: { p_profile_id: string }; Returns: boolean }
     }
     Enums: {
       lesson_status: "scheduled" | "done" | "cancelled"

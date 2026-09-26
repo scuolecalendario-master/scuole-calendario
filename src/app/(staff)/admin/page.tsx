@@ -6,19 +6,21 @@ import { NotificationsToggle } from "@/components/notifications-toggle";
 import { getLessonsToRecord, getOpenRequests } from "@/lib/admin-stats";
 import { formatCompact, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
+import { orThrow } from "@/lib/db";
 
 /** Pannello "Oggi": le cose da fare per prime (DESIGN.md §2). */
 export default async function AdminDashboard() {
   const today = todayISO();
   const supabase = await createClient();
-  const [requests, toRecord, { data: todayLessons }] = await Promise.all([
+  const [requests, toRecord, todayLessons] = await Promise.all([
     getOpenRequests(5),
     getLessonsToRecord(),
     supabase
       .from("lessons")
       .select("id, start_time, end_time, status, attendees_count, schools(name), classes(grade_name, total_enrolled)")
       .eq("date", today)
-      .order("start_time"),
+      .order("start_time")
+      .then(orThrow),
   ]);
 
   // Da registrare, raggruppate per istruttore della classe (o "Senza istruttore")

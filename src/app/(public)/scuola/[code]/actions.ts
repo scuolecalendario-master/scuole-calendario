@@ -32,10 +32,11 @@ export async function requestChange(
     const time = String(formData.get("proposed_time") ?? "").slice(0, 5);
 
     const supabase = createSchoolClient(code);
-    const [{ data: school }, { data: lesson }] = await Promise.all([
+    const [{ data: school, error: schoolError }, { data: lesson, error: lessonError }] = await Promise.all([
       supabase.from("schools").select("id, name").maybeSingle(),
       supabase.from("lessons").select("date, start_time, classes(grade_name)").eq("id", lessonId).maybeSingle(),
     ]);
+    if (schoolError || lessonError) throw new FormError("Collegamento non riuscito: riprova tra poco.");
     if (!school || !lesson) throw new FormError("Lezione non trovata.");
 
     // Nessun .select(): le scuole possono inserire ma non leggere le richieste

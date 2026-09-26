@@ -27,11 +27,12 @@ export async function recordLesson(lessonId: string, input: RecordInput): Promis
   if (!/^[0-9a-f-]{36}$/i.test(lessonId)) return { error: "Lezione non valida." };
 
   const supabase = await createClient();
-  const { data: lesson } = await supabase
+  const { data: lesson, error: readError } = await supabase
     .from("lessons")
     .select("date, status, instructor_id, classes(level, total_enrolled)")
     .eq("id", lessonId)
     .maybeSingle();
+  if (readError) return { error: "Collegamento non riuscito: riprova tra poco." };
   if (!lesson?.classes) return { error: "Lezione non trovata." };
   if (lesson.status === "cancelled") return { error: "La lezione è stata annullata." };
 

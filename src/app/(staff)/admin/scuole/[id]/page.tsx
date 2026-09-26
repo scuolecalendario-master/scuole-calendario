@@ -5,6 +5,7 @@ import { ConfirmAction } from "@/components/confirm-action";
 import { CopyLink } from "@/components/copy-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
+import { orThrow } from "@/lib/db";
 import {
   createClass,
   createSite,
@@ -26,7 +27,7 @@ export default async function SchoolDetailPage({ params }: PageProps<"/admin/scu
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
   const supabase = await createClient();
-  const [{ data: school }, { data: staff }] = await Promise.all([
+  const [school, staff] = await Promise.all([
     supabase
       .from("schools")
       .select(
@@ -35,12 +36,14 @@ export default async function SchoolDetailPage({ params }: PageProps<"/admin/scu
       .eq("id", id)
       .order("name", { referencedTable: "sites" })
       .order("grade_name", { referencedTable: "classes" })
-      .maybeSingle(),
+      .maybeSingle()
+      .then(orThrow),
     supabase
       .from("profiles")
       .select("id, full_name, email")
       .not("role", "is", null)
-      .order("full_name"),
+      .order("full_name")
+      .then(orThrow),
   ]);
 
   if (!school) notFound();

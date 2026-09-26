@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/auth";
 import { addDays, formatDay, isISODate, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { orThrow } from "@/lib/db";
 import { AttendanceCard, type AttendanceLesson } from "./attendance-card";
 
 const LESSON_COLUMNS =
@@ -20,8 +21,8 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
   const isMaster = me.role === "master";
 
   const supabase = await createClient();
-  const [{ data: dayRows }, { data: backlogRows }] = await Promise.all([
-    supabase.from("lessons").select(LESSON_COLUMNS).eq("date", date).order("start_time"),
+  const [dayRows, backlogRows] = await Promise.all([
+    supabase.from("lessons").select(LESSON_COLUMNS).eq("date", date).order("start_time").then(orThrow),
     // Lezioni passate ancora da registrare
     supabase
       .from("lessons")
@@ -30,7 +31,8 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
       .gte("date", addDays(today, -BACKLOG_DAYS))
       .lt("date", today)
       .order("date")
-      .order("start_time"),
+      .order("start_time")
+      .then(orThrow),
   ]);
 
   type Row = NonNullable<typeof dayRows>[number];

@@ -72,10 +72,6 @@ export function focusLabel(id: string, note?: string | null) {
   return f.label;
 }
 
-export function focusDescription(id: string) {
-  return ALL.get(id)?.description;
-}
-
 /** Filtra e valida i focus inviati dal client per il livello della classe. */
 export function sanitizeFocus(level: SchoolLevel, focus: unknown): string[] {
   if (!Array.isArray(focus)) return [];

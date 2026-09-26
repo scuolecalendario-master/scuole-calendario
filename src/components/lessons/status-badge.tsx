@@ -11,7 +11,7 @@ export const STATUS_LABEL: Record<LessonStatus, string> = {
   cancelled: "Annullata",
 };
 
-export const STATUS_ICON: Record<LessonStatus, LucideIcon> = {
+const STATUS_ICON: Record<LessonStatus, LucideIcon> = {
   scheduled: Clock,
   done: Check,
   cancelled: X,

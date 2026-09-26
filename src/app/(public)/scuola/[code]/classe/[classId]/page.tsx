@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { ChangeClassButton, RememberClass } from "../../remember-class";
 import { HomeLogo } from "@/components/brand";
 import { InstallBanner } from "@/components/install/install-banner";
+import { orThrow } from "@/lib/db";
 import { RequestChangeButton } from "./request-dialog";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -33,17 +34,19 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
 
   const today = todayISO();
   const yearStart = startOfSchoolYear(today);
-  const [{ data: cls }, { data: lessons }] = await Promise.all([
+  const [clsRes, lessonsRes] = await Promise.all([
     supabase.from("classes").select("id, grade_name, level, sites(name)").eq("id", classId).maybeSingle(),
     supabase
       .from("lessons")
       .select("id, date, start_time, end_time, status, attendees_count, focus, focus_note")
       .eq("class_id", classId)
       .gte("date", yearStart)
-      .lt("date", addDays(yearStart, 366))
+      // un anno avanti da oggi: d'estate compaiono già le lezioni di settembre
+      .lt("date", addDays(today, 366))
       .order("date")
       .order("start_time"),
   ]);
+  const [cls, lessons] = [orThrow(clsRes), orThrow(lessonsRes)];
   if (!cls) notFound();
 
   const color = classColor(cls.id);

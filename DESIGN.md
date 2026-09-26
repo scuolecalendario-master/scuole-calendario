@@ -26,7 +26,7 @@
 
 - **Nome**: “AquaClass Connect” (breve: “AquaClass” per l'icona sul telefono).
 - **File**: emblema in `public/brand/aquaclass-mark-128.webp` e `-384.webp` (ricavati da
-  `AquaClass_Connect_logo.svg`, ritagliati e alleggeriti: l'originale pesa ~1 MB). La scritta “AquaClass Connect”
+  `design/AquaClass_Connect_logo.svg`, ritagliati e alleggeriti: l'originale pesa ~1 MB). La scritta “AquaClass Connect”
   è sempre HTML (`Wordmark`). Icone dell'app in `public/icons/` generate dall'emblema su fondo bianco.
 - **Componenti** (`src/components/brand.tsx`): `HomeLogo` (emblema + scritta, **è il tasto Home**),
   `BrandHeader` (logo grande centrato su home/login/registrazione), `BrandMark`, `Wordmark`.

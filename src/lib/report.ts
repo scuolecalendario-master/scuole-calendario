@@ -3,6 +3,7 @@ import "server-only";
 import { isISODate, startOfSchoolYear, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import type { Database, Enums } from "@/types/database";
+import { orThrow } from "@/lib/db";
 
 export type ClassReportRow =
   Database["public"]["Functions"]["lesson_report"]["Returns"][number];
@@ -103,8 +104,7 @@ export async function getFocusReport(filters: ReportFilters) {
 
 export async function getSchoolOptions() {
   const supabase = await createClient();
-  const { data } = await supabase.from("schools").select("id, name").order("name");
-  return data ?? [];
+  return orThrow(await supabase.from("schools").select("id, name").order("name"));
 }
 
 const numberFormat = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 1 });

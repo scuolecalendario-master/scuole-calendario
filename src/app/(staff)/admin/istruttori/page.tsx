@@ -7,6 +7,7 @@ import { classColor } from "@/lib/colors";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import type { Enums } from "@/types/database";
+import { orThrow } from "@/lib/db";
 import { deleteRegistrationCode, revokeAccess } from "./actions";
 import { CodeForm } from "./code-form";
 import { ResetPasswordButton } from "./reset-password";
@@ -28,18 +29,20 @@ export default async function StaffPage() {
   const me = await requireRole("master");
   const supabase = await createClient();
 
-  const [{ data: staff }, { data: codes }] = await Promise.all([
+  const [staff, codes] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, email, full_name, role, class_instructors(classes(id, grade_name, school_id, schools(name)))")
       .not("role", "is", null)
       .order("role", { ascending: false })
-      .order("full_name"),
+      .order("full_name")
+      .then(orThrow),
     supabase
       .from("registration_codes")
       .select("id, code, label, role, expires_at, used_at, profiles!registration_codes_used_by_fkey(email, full_name)")
       .order("created_at", { ascending: false })
-      .limit(50),
+      .limit(50)
+      .then(orThrow),
   ]);
 
   const now = new Date().toISOString();

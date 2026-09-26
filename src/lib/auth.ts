@@ -5,6 +5,7 @@ import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
+import { orThrow } from "@/lib/db";
 
 export type UserRole = Enums<"user_role">;
 
@@ -15,13 +16,14 @@ export const getCurrentProfile = cache(async () => {
   const userId = data?.claims?.sub;
   if (!userId) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, role, must_change_password")
-    .eq("id", userId)
-    .maybeSingle();
-
-  return profile;
+  // Errore del database: pagina "Riprova", non un finto "non sei loggato"
+  return orThrow(
+    await supabase
+      .from("profiles")
+      .select("id, email, full_name, role, must_change_password")
+      .eq("id", userId)
+      .maybeSingle(),
+  );
 });
 
 /** Pagina di destinazione dopo il login in base al ruolo. */

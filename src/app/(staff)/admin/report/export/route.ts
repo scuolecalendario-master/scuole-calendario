@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const profile = await getCurrentProfile();
-  if (profile?.role !== "master") {
+  if (profile?.role !== "master" || profile.must_change_password) {
     return new Response("Non autorizzato", { status: 403 });
   }
 

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { addDays, formatCompact, formatMonth, startOfSchoolYear, todayISO } from "@/lib/dates";
+import { addDays, formatCompact, formatMonth, todayISO } from "@/lib/dates";
 import { LEVEL_LABEL, LEVELS, type SchoolLevel } from "@/lib/focus";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +51,9 @@ function minutesBetween(a: string, b: string) {
 export function CourseForm({ schools }: { schools: School[] }) {
   const router = useRouter();
   const today = todayISO();
-  const defaultEnd = `${Number(startOfSchoolYear(today).slice(0, 4)) + 1}-05-31`;
+  // Il prossimo 31 maggio (d'estate quello dell'anno dopo, non uno già passato)
+  const thisMay = `${today.slice(0, 4)}-05-31`;
+  const defaultEnd = thisMay >= today ? thisMay : `${Number(today.slice(0, 4)) + 1}-05-31`;
 
   const [schoolId, setSchoolId] = useState(schools[0].id);
   const [classId, setClassId] = useState("");

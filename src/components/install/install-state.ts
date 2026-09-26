@@ -51,7 +51,7 @@ export async function promptInstall() {
   return outcome;
 }
 
-export function isStandalone() {
+function isStandalone() {
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
     ("standalone" in navigator && Boolean((navigator as { standalone?: boolean }).standalone))

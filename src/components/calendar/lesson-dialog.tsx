@@ -185,6 +185,7 @@ function LessonForm({
             ...input,
             status,
             attendeesCount: status === "done" && raw !== "" ? Number(raw) : null,
+            expectedUpdatedAt: lesson.updated_at,
           }),
           "Lezione aggiornata.",
         );
