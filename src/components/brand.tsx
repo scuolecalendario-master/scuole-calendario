@@ -5,11 +5,14 @@ import { cn } from "@/lib/utils";
 
 export const APP_NAME = "AquaClass Connect";
 
-/** Emblema (cerchio con scuola e piscina). SVG statico in public/brand. */
+/**
+ * Emblema (scuola, nuotatore e onde). WebP leggeri in public/brand ricavati dal
+ * logo originale: 128 px per le misure piccole, 384 px per quelle grandi.
+ */
 export function BrandMark({ size = 40, className }: { size?: number; className?: string }) {
   return (
     <Image
-      src="/brand/aquaclass-mark.svg"
+      src={size <= 64 ? "/brand/aquaclass-mark-128.webp" : "/brand/aquaclass-mark-384.webp"}
       alt=""
       width={size}
       height={size}

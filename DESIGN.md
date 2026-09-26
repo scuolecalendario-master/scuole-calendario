@@ -25,8 +25,9 @@
 ## 2b. Marchio: AquaClass Connect
 
 - **Nome**: “AquaClass Connect” (breve: “AquaClass” per l'icona sul telefono).
-- **File**: `public/brand/aquaclass-logo.svg` (completo, con scritta) e `public/brand/aquaclass-mark.svg`
-  (solo emblema, per icone e intestazioni). Icone dell'app in `public/icons/` generate dall'emblema su fondo bianco.
+- **File**: emblema in `public/brand/aquaclass-mark-128.webp` e `-384.webp` (ricavati da
+  `AquaClass_Connect_logo.svg`, ritagliati e alleggeriti: l'originale pesa ~1 MB). La scritta “AquaClass Connect”
+  è sempre HTML (`Wordmark`). Icone dell'app in `public/icons/` generate dall'emblema su fondo bianco.
 - **Componenti** (`src/components/brand.tsx`): `HomeLogo` (emblema + scritta, **è il tasto Home**),
   `BrandHeader` (logo grande centrato su home/login/registrazione), `BrandMark`, `Wordmark`.
 - **Su sfondo blu** (header) l'emblema sta in un cerchio bianco; scritta bianca + “Connect” `#A5F3FC` (5,5:1).

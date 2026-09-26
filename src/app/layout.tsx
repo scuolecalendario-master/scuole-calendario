@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   applicationName: "AquaClass Connect",
   icons: {
     icon: [
-      { url: "/brand/aquaclass-mark.svg", type: "image/svg+xml" },
       { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-48.png", sizes: "48x48", type: "image/png" },
     ],
     apple: "/icons/apple-touch-icon.png",
   },
