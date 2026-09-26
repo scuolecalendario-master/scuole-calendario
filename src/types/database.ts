@@ -344,6 +344,7 @@ export type Database = {
       }
       schools: {
         Row: {
+          change_requests_enabled: boolean
           contact_email: string | null
           created_at: string
           id: string
@@ -351,6 +352,7 @@ export type Database = {
           unique_code: string
         }
         Insert: {
+          change_requests_enabled?: boolean
           contact_email?: string | null
           created_at?: string
           id?: string
@@ -358,6 +360,7 @@ export type Database = {
           unique_code: string
         }
         Update: {
+          change_requests_enabled?: boolean
           contact_email?: string | null
           created_at?: string
           id?: string
@@ -423,6 +426,7 @@ export type Database = {
       }
       generate_registration_code: { Args: never; Returns: string }
       generate_school_code: { Args: { school_name: string }; Returns: string }
+      instructor_school_ids: { Args: never; Returns: string[] }
       is_class_instructor: { Args: { p_class_id: string }; Returns: boolean }
       lesson_report: {
         Args: { p_from: string; p_school_id?: string; p_to: string }

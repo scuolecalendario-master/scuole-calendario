@@ -12,7 +12,7 @@ export async function getPortalSchool(rawCode: string) {
   if (!isValidSchoolCode(code)) notFound();
 
   const supabase = createSchoolClient(code);
-  const { data: school } = await supabase.from("schools").select("id, name").maybeSingle();
+  const { data: school } = await supabase.from("schools").select("id, name, change_requests_enabled").maybeSingle();
   if (!school) notFound();
 
   return { code, school, supabase };

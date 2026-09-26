@@ -47,6 +47,8 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
   if (!cls) notFound();
 
   const color = classColor(cls.id);
+  // Il master può disattivare le richieste di spostamento per l'istituto
+  const canRequest = school.change_requests_enabled;
   const now = nowTimeRome();
   const isUpcoming = (l: { date: string; end_time: string }) =>
     l.date > today || (l.date === today && l.end_time.slice(0, 5) > now);
@@ -107,13 +109,15 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
             <p className="mt-1 inline-block rounded-full bg-white px-3 py-0.5 text-sm font-bold" style={{ color }}>
               {relativeDay(next.date, today)}
             </p>
-            <div className="mt-4">
-              <RequestChangeButton
-                code={code}
-                lesson={{ id: next.id, label: lessonLabel(next) }}
-                variant="onColor"
-              />
-            </div>
+            {canRequest && (
+              <div className="mt-4">
+                <RequestChangeButton
+                  code={code}
+                  lesson={{ id: next.id, label: lessonLabel(next) }}
+                  variant="onColor"
+                />
+              </div>
+            )}
           </>
         ) : (
           <p className="mt-1 text-2xl font-bold">Nessuna lezione in programma</p>
@@ -144,7 +148,7 @@ export default async function ClassPortalPage({ params }: PageProps<"/scuola/[co
                       </p>
                       {l.status === "cancelled" && <StatusBadge status="cancelled" className="mt-1" />}
                     </div>
-                    {l.status !== "cancelled" && (
+                    {canRequest && l.status !== "cancelled" && (
                       <RequestChangeButton code={code} lesson={{ id: l.id, label: lessonLabel(l) }} variant="compact" />
                     )}
                   </li>

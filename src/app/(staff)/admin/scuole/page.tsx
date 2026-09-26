@@ -17,7 +17,7 @@ export default async function SchoolsPage() {
   const supabase = await createClient();
   const { data: schools } = await supabase
     .from("schools")
-    .select("id, name, unique_code, contact_email, sites(count), classes(total_enrolled)")
+    .select("id, name, unique_code, contact_email, change_requests_enabled, sites(count), classes(total_enrolled)")
     .order("name");
 
   return (
@@ -48,6 +48,7 @@ export default async function SchoolsPage() {
                 <TableHead className="text-right">Plessi</TableHead>
                 <TableHead className="text-right">Classi</TableHead>
                 <TableHead className="text-right">Iscritti</TableHead>
+                <TableHead>Richieste</TableHead>
                 <TableHead className="hidden md:table-cell">Contatto</TableHead>
               </TableRow>
             </TableHeader>
@@ -64,6 +65,13 @@ export default async function SchoolsPage() {
                   <TableCell className="text-right tabular-nums">{s.classes.length}</TableCell>
                   <TableCell className="text-right tabular-nums">
                     {s.classes.reduce((sum, c) => sum + c.total_enrolled, 0)}
+                  </TableCell>
+                  <TableCell>
+                    {s.change_requests_enabled ? (
+                      <span className="rounded-full bg-done-soft px-2 py-0.5 text-xs font-bold text-done-text">Sì</span>
+                    ) : (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold">No</span>
+                    )}
                   </TableCell>
                   <TableCell className="hidden text-muted-foreground md:table-cell">
                     {s.contact_email ?? "—"}

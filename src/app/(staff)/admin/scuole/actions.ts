@@ -213,3 +213,15 @@ export async function deleteSite(siteId: string) {
   if (error) throw new Error(dbErrorMessage(error));
   revalidatePath(`/admin/scuole/${data.school_id}`);
 }
+
+// ---------- Richieste di spostamento ----------
+
+/** Attiva o disattiva "Chiedi uno spostamento" per le maestre dell'istituto. */
+export async function setChangeRequestsEnabled(schoolId: string, enabled: boolean) {
+  await requireRole("master");
+  if (!UUID.test(schoolId)) throw new Error("Istituto non valido.");
+  const supabase = await createClient();
+  const { error } = await supabase.from("schools").update({ change_requests_enabled: enabled }).eq("id", schoolId);
+  if (error) throw new Error(dbErrorMessage(error));
+  revalidatePath("/admin", "layout");
+}

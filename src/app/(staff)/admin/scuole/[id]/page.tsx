@@ -17,6 +17,7 @@ import {
   updateSchool,
 } from "../actions";
 import { SchoolForm } from "../school-form";
+import { ChangeRequestsToggle } from "./change-requests-toggle";
 import { ClassRow, NewClassForm, type ClassData } from "./class-forms";
 import { NewSiteForm, SiteHeader } from "./site-forms";
 
@@ -29,7 +30,7 @@ export default async function SchoolDetailPage({ params }: PageProps<"/admin/scu
     supabase
       .from("schools")
       .select(
-        "id, name, unique_code, contact_email, sites(id, name), classes(id, grade_name, total_enrolled, level, site_id, lessons(count), class_instructors(profile_id))",
+        "id, name, unique_code, contact_email, change_requests_enabled, sites(id, name), classes(id, grade_name, total_enrolled, level, site_id, lessons(count), class_instructors(profile_id))",
       )
       .eq("id", id)
       .order("name", { referencedTable: "sites" })
@@ -95,6 +96,7 @@ export default async function SchoolDetailPage({ params }: PageProps<"/admin/scu
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <CopyLink path={`/scuola/${school.unique_code}`} />
+          <ChangeRequestsToggle schoolId={school.id} enabled={school.change_requests_enabled} />
           <div>
             <ConfirmAction
               action={regenerateSchoolCode.bind(null, school.id)}
