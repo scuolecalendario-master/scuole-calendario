@@ -13,9 +13,9 @@ import type { Enums } from "@/types/database";
 
 export type LessonActionResult = { error?: string; count?: number };
 
+// Gli istruttori si assegnano alla CLASSE (pagina dell'istituto), non alla lezione.
 export type LessonInput = {
   classId: string;
-  instructorId: string | null;
   date: string;
   startTime: string;
   endTime: string;
@@ -31,9 +31,6 @@ class InputError extends Error {}
 
 function validate(input: LessonInput) {
   if (!UUID.test(input.classId)) throw new InputError("Seleziona una classe.");
-  if (input.instructorId !== null && !UUID.test(input.instructorId)) {
-    throw new InputError("Istruttore non valido.");
-  }
   if (!isISODate(input.date)) throw new InputError("Data non valida.");
   if (!TIME.test(input.startTime) || !TIME.test(input.endTime)) {
     throw new InputError("Orario non valido.");
@@ -45,7 +42,6 @@ function validate(input: LessonInput) {
 
   return {
     class_id: input.classId,
-    instructor_id: input.instructorId,
     date: input.date,
     start_time: start,
     end_time: end,
@@ -182,7 +178,6 @@ export async function createCourse(input: {
     }
     const row = validate({
       classId: input.classId,
-      instructorId: null,
       date: dates[0],
       startTime: input.startTime,
       endTime: input.endTime,

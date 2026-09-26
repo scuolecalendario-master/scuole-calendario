@@ -59,7 +59,7 @@ export function LessonDialog({
               onSaved={onSaved}
             />
           ) : (
-            target.mode === "edit" && <LessonDetails target={target} instructors={instructors} />
+            target.mode === "edit" && <LessonDetails target={target} schools={schools} instructors={instructors} />
           ))}
       </DialogContent>
     </Dialog>
@@ -80,16 +80,24 @@ function FocusList({ lesson }: { lesson: CalendarLesson }) {
   );
 }
 
+/** Istruttori assegnati alla classe (unica fonte: pagina dell'istituto). */
+function classInstructorNames(schools: CalendarSchool[], instructors: CalendarPerson[], classId: string) {
+  const ids = schools.flatMap((s) => s.classes).find((c) => c.id === classId)?.instructorIds ?? [];
+  return ids.map((id) => instructors.find((i) => i.id === id)?.name).filter(Boolean) as string[];
+}
+
 /** Sola lettura (istruttori). */
 function LessonDetails({
   target,
+  schools,
   instructors,
 }: {
   target: Extract<DialogTarget, { mode: "edit" }>;
+  schools: CalendarSchool[];
   instructors: CalendarPerson[];
 }) {
   const l = target.lesson;
-  const instructor = instructors.find((i) => i.id === l.instructor_id)?.name;
+  const names = classInstructorNames(schools, instructors, l.class_id);
   return (
     <>
       <DialogHeader>
@@ -103,8 +111,8 @@ function LessonDetails({
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
         <dt className="text-muted-foreground">Stato</dt>
         <dd><StatusBadge status={l.status} /></dd>
-        <dt className="text-muted-foreground">Istruttore</dt>
-        <dd>{instructor ?? "Non assegnato"}</dd>
+        <dt className="text-muted-foreground">Istruttori</dt>
+        <dd>{names.length ? names.join(", ") : "Nessuno assegnato alla classe"}</dd>
         <dt className="text-muted-foreground">Presenti</dt>
         <dd className="tabular-nums">
           {l.attendees_count ?? "—"} / {l.classes?.total_enrolled}
@@ -152,6 +160,7 @@ function LessonForm({
 
   const classes = schools.find((s) => s.id === schoolId)?.classes ?? [];
   const enrolled = classes.find((c) => c.id === classId)?.total_enrolled;
+  const instructorNames = classInstructorNames(schools, instructors, classId);
 
   function handle(result: LessonActionResult, message: string) {
     if (result.error) setError(result.error);
@@ -162,7 +171,6 @@ function LessonForm({
     setError(undefined);
     const input = {
       classId,
-      instructorId: String(formData.get("instructor") || "") || null,
       date: String(formData.get("date")),
       startTime: String(formData.get("start")),
       endTime: String(formData.get("end")),
@@ -215,7 +223,7 @@ function LessonForm({
       </DialogHeader>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Scuola" htmlFor="school">
+        <Field label="Istituto" htmlFor="school">
           <NativeSelect
             id="school"
             value={schoolId}
@@ -244,16 +252,15 @@ function LessonForm({
             ))}
           </NativeSelect>
         </Field>
-        <Field label="Istruttore" htmlFor="instructor" className="sm:col-span-2">
-          <NativeSelect id="instructor" name="instructor" defaultValue={lesson?.instructor_id ?? ""}>
-            <option value="">Non assegnato</option>
-            {instructors.map((i) => (
-              <option key={i.id} value={i.id}>
-                {i.name}
-              </option>
-            ))}
-          </NativeSelect>
-        </Field>
+        {classId && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-muted px-3 py-2 text-sm sm:col-span-2">
+            <span className="font-medium">Istruttori:</span>
+            <span>{instructorNames.length ? instructorNames.join(", ") : "nessuno assegnato alla classe"}</span>
+            <Link href={`/admin/scuole/${schoolId}`} className="ml-auto font-semibold text-primary underline">
+              Modifica nella classe
+            </Link>
+          </div>
+        )}
         <Field label="Data" htmlFor="date" className="sm:col-span-2">
           <Input id="date" name="date" type="date" defaultValue={defaults.date} required />
         </Field>

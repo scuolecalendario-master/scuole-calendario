@@ -5,7 +5,14 @@ export type CalendarSchool = {
   name: string;
   color: string;
   sites: { id: string; name: string }[];
-  classes: { id: string; grade_name: string; total_enrolled: number; site_id: string | null }[];
+  classes: {
+    id: string;
+    grade_name: string;
+    total_enrolled: number;
+    site_id: string | null;
+    /** Istruttori assegnati alla classe (unica fonte: pagina dell'istituto). */
+    instructorIds: string[];
+  }[];
 };
 
 export type CalendarPerson = { id: string; name: string };

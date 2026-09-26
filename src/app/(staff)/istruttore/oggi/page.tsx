@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { AttendanceCard, type AttendanceLesson } from "./attendance-card";
 
 const LESSON_COLUMNS =
-  "id, date, start_time, end_time, status, attendees_count, focus, focus_note, instructor_id, schools(name), classes(grade_name, total_enrolled, level, class_instructors(profile_id)), profiles(full_name, email)";
+  "id, date, start_time, end_time, status, attendees_count, focus, focus_note, instructor_id, schools(name), classes(grade_name, total_enrolled, level, class_instructors(profile_id, profiles(full_name, email)))";
 const BACKLOG_DAYS = 14;
 
 export default async function TodayPage({ searchParams }: PageProps<"/istruttore/oggi">) {
@@ -49,7 +49,12 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
     gradeName: l.classes?.grade_name ?? "",
     level: l.classes?.level ?? "elementari",
     enrolled: l.classes?.total_enrolled ?? 0,
-    instructorName: l.profiles?.full_name ?? l.profiles?.email ?? null,
+    // Istruttori assegnati alla classe (pagina dell'istituto)
+    instructorName:
+      l.classes?.class_instructors
+        .map((ci) => ci.profiles?.full_name ?? ci.profiles?.email)
+        .filter(Boolean)
+        .join(", ") || null,
     canEdit: isMaster || isMine(l),
   });
 

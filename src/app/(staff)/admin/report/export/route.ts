@@ -55,7 +55,7 @@ async function lessonsCSV(filters: ReportFilters) {
     let query = supabase
       .from("lessons")
       .select(
-        "date, start_time, end_time, status, attendees_count, focus, focus_note, notes, schools(name), classes(grade_name, total_enrolled, level, sites(name)), profiles(full_name, email)",
+        "date, start_time, end_time, status, attendees_count, focus, focus_note, notes, schools(name), classes(grade_name, total_enrolled, level, sites(name), class_instructors(profiles(full_name, email))), profiles(full_name, email)",
       )
       .gte("date", filters.from)
       .lte("date", filters.to)
@@ -72,7 +72,7 @@ async function lessonsCSV(filters: ReportFilters) {
   }
 
   return toCSV(
-    ["Data", "Inizio", "Fine", "Istituto", "Plesso", "Classe", "Livello", "Iscritti", "Stato", "Presenti", "Focus", "Istruttore", "Note"],
+    ["Data", "Inizio", "Fine", "Istituto", "Plesso", "Classe", "Livello", "Iscritti", "Stato", "Presenti", "Focus", "Istruttori", "Registrata da", "Note"],
     rows.map((l) => [
       formatDate(l.date),
       formatTime(l.start_time),
@@ -85,6 +85,7 @@ async function lessonsCSV(filters: ReportFilters) {
       STATUS_LABEL[l.status],
       l.attendees_count,
       l.focus.map((id) => focusLabel(id, l.focus_note)).join(", "),
+      l.classes?.class_instructors.map((ci) => ci.profiles?.full_name ?? ci.profiles?.email).filter(Boolean).join(", "),
       l.profiles?.full_name ?? l.profiles?.email,
       l.notes,
     ]),

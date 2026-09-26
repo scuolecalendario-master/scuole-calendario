@@ -79,13 +79,20 @@ export function LessonCalendar({
   const school = schools.find((s) => s.id === schoolId);
   const sitesOfSchool = school?.sites ?? [];
   const classesOfSchool = (school?.classes ?? []).filter((c) => !siteId || c.site_id === siteId);
-  const siteClassIds = useMemo(
-    () =>
-      siteId
-        ? (schools.find((s) => s.id === schoolId)?.classes ?? []).filter((c) => c.site_id === siteId).map((c) => c.id)
-        : [],
-    [siteId, schoolId, schools],
-  );
+  // Classi ammesse da plesso, classe e istruttore (null = nessun filtro per classe).
+  // L'istruttore conta se è assegnato alla CLASSE (pagina dell'istituto).
+  const classFilter = useMemo(() => {
+    if (!siteId && !classId && !instructorId) return null;
+    return schools
+      .filter((s) => !schoolId || s.id === schoolId)
+      .flatMap((s) => s.classes)
+      .filter((c) => !siteId || c.site_id === siteId)
+      .filter((c) => !classId || c.id === classId)
+      .filter((c) =>
+        instructorId === "none" ? c.instructorIds.length === 0 : !instructorId || c.instructorIds.includes(instructorId),
+      )
+      .map((c) => c.id);
+  }, [schools, schoolId, siteId, classId, instructorId]);
   // Su smartphone la vista a elenco è più leggibile della griglia oraria
   const [isMobile] = useState(() => window.matchMedia("(max-width: 767px)").matches);
   // Su smartphone il titolo (periodo visualizzato) sta sopra il calendario
@@ -108,11 +115,10 @@ export function LessonCalendar({
           .order("id")
           .range(offset, offset + PAGE - 1);
         if (schoolId) query = query.eq("school_id", schoolId);
-        if (classId) query = query.eq("class_id", classId);
-        // Plesso: le lezioni non hanno il plesso, si filtra per le sue classi
-        else if (siteId) query = query.in("class_id", siteClassIds.length ? siteClassIds : ["00000000-0000-0000-0000-000000000000"]);
-        if (instructorId === "none") query = query.is("instructor_id", null);
-        else if (instructorId) query = query.eq("instructor_id", instructorId);
+        // Plesso, classe e istruttore si traducono in un elenco di classi
+        if (classFilter) {
+          query = query.in("class_id", classFilter.length ? classFilter : ["00000000-0000-0000-0000-000000000000"]);
+        }
 
         const { data, error } = await query;
         if (error) throw new Error(error.message);
@@ -141,7 +147,7 @@ export function LessonCalendar({
         };
       });
     },
-    [supabase, schoolId, siteId, siteClassIds, classId, instructorId, colorBySchool],
+    [supabase, schoolId, classFilter, colorBySchool],
   );
 
   const refetch = () => calendarRef.current?.getApi().refetchEvents();
@@ -251,8 +257,8 @@ export function LessonCalendar({
         <Filter label="Istruttore" id="f-instructor">
           <NativeSelect id="f-instructor" value={instructorId} onChange={(e) => setInstructorId(e.target.value)}>
             <option value="">Tutti</option>
-            {!editable && <option value={currentUserId}>Solo le mie lezioni</option>}
-            {editable && <option value="none">Non assegnate</option>}
+            {!editable && <option value={currentUserId}>Solo le mie classi</option>}
+            {editable && <option value="none">Classi senza istruttore</option>}
             {editable &&
               instructors.map((i) => (
                 <option key={i.id} value={i.id}>
