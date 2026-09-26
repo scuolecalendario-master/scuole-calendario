@@ -114,7 +114,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
         <div className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1 text-sm font-semibold">
           {[
             { label: "Le mie classi", active: !showAll, to: href({ data: date }) },
-            { label: "Tutte", active: showAll, to: href({ data: date, vista: "tutte" }) },
+            { label: "I miei istituti", active: showAll, to: href({ data: date, vista: "tutte" }) },
           ].map((t) => (
             <Link
               key={t.label}
@@ -141,7 +141,7 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
           Nessuna lezione{!showAll && hiddenCount > 0 ? " delle tue classi" : ""} in questo giorno.
           {!showAll && hiddenCount > 0 && (
             <Link href={href({ data: date, vista: "tutte" })} className="mt-2 block font-medium text-primary underline">
-              Vedi tutte ({hiddenCount})
+              Vedi i miei istituti ({hiddenCount})
             </Link>
           )}
         </p>
