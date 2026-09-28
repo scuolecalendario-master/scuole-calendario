@@ -4,15 +4,17 @@ import { requireRole } from "@/lib/auth";
 
 export default async function InstructorLayout({ children }: LayoutProps<"/istruttore">) {
   const profile = await requireRole("instructor", "master");
+  const isMaster = profile.role === "master";
 
   return (
     <div className="flex flex-1 flex-col">
       <StaffHeader
-        title="Istruttore"
-        homeHref="/istruttore/oggi"
+        title={isMaster ? "Le mie lezioni" : "Istruttore"}
+        homeHref={isMaster ? "/admin" : "/istruttore/oggi"}
         links={[
           { href: "/istruttore/oggi", label: "Oggi" },
           { href: "/istruttore/calendario", label: "Calendario" },
+          ...(isMaster ? [{ href: "/admin", label: "← Pannello" }] : []),
         ]}
         userLabel={profile.full_name ?? profile.email ?? ""}
       />

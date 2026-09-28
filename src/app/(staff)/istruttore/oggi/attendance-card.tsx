@@ -119,7 +119,7 @@ export function AttendanceCard({
             <p className="text-sm text-muted-foreground">Registrano gli istruttori di questa classe.</p>
           )}
           {isFuture && lesson.canEdit && !cancelled && (
-            <p className="text-sm text-muted-foreground">Potrai registrarla il giorno della lezione.</p>
+            <p className="text-sm text-muted-foreground">Svolta, presenti e focus si segnano dal giorno della lezione.</p>
           )}
           {editable && done && (
             <Button variant="outline" onClick={() => setEditing(true)} className="h-11 self-start px-5">

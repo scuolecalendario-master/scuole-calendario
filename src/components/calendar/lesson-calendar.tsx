@@ -53,6 +53,7 @@ export function LessonCalendar({
   currentUserId,
   initialDate,
   openLessonId,
+  onlyMine = false,
 }: {
   /** true = master: crea, sposta, modifica ed elimina. false = sola lettura. */
   editable: boolean;
@@ -63,12 +64,14 @@ export function LessonCalendar({
   initialDate?: string;
   /** Lezione di cui aprire subito il dettaglio. */
   openLessonId?: string;
+  /** Parte con il filtro "Solo le mie classi" (agenda personale). */
+  onlyMine?: boolean;
 }) {
   const calendarRef = useRef<CalendarRef>(null);
   const [schoolId, setSchoolId] = useState("");
   const [siteId, setSiteId] = useState("");
   const [classId, setClassId] = useState("");
-  const [instructorId, setInstructorId] = useState("");
+  const [instructorId, setInstructorId] = useState(onlyMine ? currentUserId : "");
   const [dialog, setDialog] = useState<DialogTarget | null>(null);
   const [notice, setNotice] = useState<{ type: "ok" | "error"; text: string } | null>(null);
   // La lezione richiesta via URL si apre una sola volta, al primo caricamento

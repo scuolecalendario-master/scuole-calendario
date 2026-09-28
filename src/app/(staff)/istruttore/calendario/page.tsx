@@ -8,7 +8,7 @@ export default async function InstructorCalendarPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{me.role === "master" ? "Calendario generale" : "Il mio calendario"}</h1>
+      <h1 className="text-2xl font-bold">Il mio calendario</h1>
       {/* La RLS mostra agli istruttori solo gli istituti delle loro classi (e le supplenze) */}
       {schools.length === 0 ? (
         <p className="rounded-2xl border-2 border-dashed p-8 text-center text-muted-foreground">
@@ -20,6 +20,7 @@ export default async function InstructorCalendarPage() {
           schools={schools}
           instructors={instructors}
           currentUserId={me.id}
+          onlyMine
         />
       )}
     </div>

@@ -19,6 +19,8 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         links={[
           { href: "/admin", label: "Oggi", exact: true, badge: toRecord },
           { href: "/admin/calendario", label: "Calendario" },
+          // Il master che insegna: le sue classi, come un istruttore
+          { href: "/istruttore/oggi", label: "Le mie lezioni" },
           { href: "/admin/programma", label: "Corsi" },
           { href: "/admin/richieste", label: "Richieste", badge: openRequests },
           { href: "/admin/scuole", label: "Istituti" },

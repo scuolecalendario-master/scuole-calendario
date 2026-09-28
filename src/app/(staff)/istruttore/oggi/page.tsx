@@ -60,9 +60,10 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
     canEdit: isMaster || isMine(l),
   });
 
-  const backlog = (backlogRows ?? []).filter((l) => (isMaster ? true : isMine(l))).map(toCard);
+  // Anche il master qui vede le sue classi: è la sua agenda da istruttore
+  const backlog = (backlogRows ?? []).filter(isMine).map(toCard);
   const all = dayRows ?? [];
-  const lessons = all.filter((l) => showAll || isMaster || isMine(l)).map(toCard);
+  const lessons = all.filter((l) => showAll || isMine(l)).map(toCard);
   const hiddenCount = all.length - lessons.length;
   const toRecord = lessons.filter((l) => l.status === "scheduled" && l.canEdit).length;
 
@@ -117,23 +118,21 @@ export default async function TodayPage({ searchParams }: PageProps<"/istruttore
         </Link>
       </nav>
 
-      {!isMaster && (
-        <div className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1 text-sm font-semibold">
-          {[
-            { label: "Le mie classi", active: !showAll, to: href({ data: date }) },
-            { label: "I miei istituti", active: showAll, to: href({ data: date, vista: "tutte" }) },
-          ].map((t) => (
-            <Link
-              key={t.label}
-              href={t.to}
-              aria-current={t.active ? "page" : undefined}
-              className={cn("flex min-h-11 items-center justify-center rounded-xl", t.active && "bg-primary text-primary-foreground")}
-            >
-              {t.label}
-            </Link>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1 text-sm font-semibold">
+        {[
+          { label: "Le mie classi", active: !showAll, to: href({ data: date }) },
+          { label: isMaster ? "Tutte" : "I miei istituti", active: showAll, to: href({ data: date, vista: "tutte" }) },
+        ].map((t) => (
+          <Link
+            key={t.label}
+            href={t.to}
+            aria-current={t.active ? "page" : undefined}
+            className={cn("flex min-h-11 items-center justify-center rounded-xl", t.active && "bg-primary text-primary-foreground")}
+          >
+            {t.label}
+          </Link>
+        ))}
+      </div>
 
       {lessons.length > 0 && (
         <p className="font-medium">
