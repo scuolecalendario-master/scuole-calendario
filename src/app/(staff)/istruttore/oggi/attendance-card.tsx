@@ -3,12 +3,13 @@
 import { Check, Minus, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 
+import { FocusPicker } from "@/components/lessons/focus-picker";
 import { StatusBadge, type LessonStatus } from "@/components/lessons/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LEVEL_STYLE } from "@/lib/colors";
 import { formatDay, formatTime } from "@/lib/dates";
-import { focusCatalog, focusLabel, LEVEL_LABEL, MAX_FOCUS, type SchoolLevel } from "@/lib/focus";
+import { focusLabel, focusNeedsNote, LEVEL_LABEL, type SchoolLevel } from "@/lib/focus";
 import { cn } from "@/lib/utils";
 import { recordLesson } from "./actions";
 
@@ -52,13 +53,8 @@ export function AttendanceCard({
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
-  const catalog = focusCatalog(lesson.level);
-  const needsNote = focus.some((id) => catalog.find((f) => f.id === id)?.withNote);
+  const needsNote = focusNeedsNote(lesson.level, focus);
   const setCountSafe = (n: number) => setCount(Math.max(0, Math.min(lesson.enrolled, n)));
-
-  function toggleFocus(id: string) {
-    setFocus((f) => (f.includes(id) ? f.filter((x) => x !== id) : f.length < MAX_FOCUS ? [...f, id] : f));
-  }
 
   function save(isDone: boolean) {
     setError(undefined);
@@ -183,46 +179,20 @@ export function AttendanceCard({
           </div>
 
           {/* Focus */}
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-2 font-semibold">
+          <div className="flex flex-col gap-2">
+            <p className="font-semibold">
               Focus della lezione <span className="font-normal text-muted-foreground">(anche più di uno)</span>
-            </legend>
-            <div className="flex flex-wrap gap-2">
-              {catalog.map((f) => (
-                <label
-                  key={f.id}
-                  className={cn(
-                    "group flex min-h-11 cursor-pointer flex-col justify-center rounded-2xl border-2 border-border bg-card px-4 py-2 text-sm font-semibold",
-                    LEVEL_STYLE[lesson.level].checked,
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={focus.includes(f.id)}
-                    onChange={() => toggleFocus(f.id)}
-                  />
-                  <span className="flex items-center gap-1.5">
-                    <Check className="hidden size-4 group-has-checked:block" aria-hidden />
-                    {f.label}
-                  </span>
-                  {f.description && (
-                    <span className="text-xs font-normal opacity-90">{f.description}</span>
-                  )}
-                </label>
-              ))}
-            </div>
-            {needsNote && (
-              <Input
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Gioco con… (es. palline, tubi, tappeto)"
-                maxLength={200}
-                className="h-11 text-base"
-                aria-label="Gioco con"
-              />
-            )}
-          </fieldset>
+            </p>
+            <FocusPicker
+              level={lesson.level}
+              value={focus}
+              note={note}
+              onChange={(f, n) => {
+                setFocus(f);
+                setNote(n);
+              }}
+            />
+          </div>
 
           {error && (
             <p className="text-sm font-medium text-cancelled-text" role="alert">

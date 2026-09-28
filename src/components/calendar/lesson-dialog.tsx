@@ -9,6 +9,7 @@ import {
   updateLesson,
   type LessonActionResult,
 } from "@/app/(staff)/admin/calendario/actions";
+import { FocusPicker } from "@/components/lessons/focus-picker";
 import { STATUS_LABEL, StatusBadge, type LessonStatus } from "@/components/lessons/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
-import { formatDay, formatTime } from "@/lib/dates";
+import { formatDay, formatTime, todayISO } from "@/lib/dates";
 import { LEVEL_STYLE } from "@/lib/colors";
 import { focusLabel } from "@/lib/focus";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,7 @@ export function LessonDialog({
   editable,
   schools,
   instructors,
+  currentUserId,
   onClose,
   onSaved,
 }: {
@@ -41,6 +42,7 @@ export function LessonDialog({
   editable: boolean;
   schools: CalendarSchool[];
   instructors: CalendarPerson[];
+  currentUserId: string;
   onClose: () => void;
   onSaved: (message: string) => void;
 }) {
@@ -59,7 +61,7 @@ export function LessonDialog({
               onSaved={onSaved}
             />
           ) : (
-            target.mode === "edit" && <LessonDetails target={target} schools={schools} instructors={instructors} />
+            target.mode === "edit" && <LessonDetails target={target} schools={schools} instructors={instructors} currentUserId={currentUserId} />
           ))}
       </DialogContent>
     </Dialog>
@@ -86,18 +88,24 @@ function classInstructorNames(schools: CalendarSchool[], instructors: CalendarPe
   return ids.map((id) => instructors.find((i) => i.id === id)?.name).filter(Boolean) as string[];
 }
 
-/** Sola lettura (istruttori). */
+/** Sola lettura (istruttori), con il collegamento per registrare le proprie lezioni. */
 function LessonDetails({
   target,
   schools,
   instructors,
+  currentUserId,
 }: {
   target: Extract<DialogTarget, { mode: "edit" }>;
   schools: CalendarSchool[];
   instructors: CalendarPerson[];
+  currentUserId: string;
 }) {
   const l = target.lesson;
   const names = classInstructorNames(schools, instructors, l.class_id);
+  const classIds = schools.flatMap((s) => s.classes).find((c) => c.id === l.class_id)?.instructorIds ?? [];
+  const mine = l.instructor_id === currentUserId || classIds.includes(currentUserId);
+  // Si registra dal giorno della lezione in poi (come in "Oggi")
+  const canRecord = mine && l.status !== "cancelled" && l.date <= todayISO();
   return (
     <>
       <DialogHeader>
@@ -125,13 +133,15 @@ function LessonDetails({
             </dd>
           </>
         )}
-        {l.notes && (
-          <>
-            <dt className="text-muted-foreground">Note</dt>
-            <dd className="whitespace-pre-wrap">{l.notes}</dd>
-          </>
-        )}
       </dl>
+      {canRecord && (
+        <Link
+          href={`/istruttore/oggi?data=${l.date}`}
+          className="flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground"
+        >
+          {l.status === "done" ? "Modifica presenti e focus" : "Registra la lezione"}
+        </Link>
+      )}
     </>
   );
 }
@@ -154,6 +164,8 @@ function LessonForm({
   const [schoolId, setSchoolId] = useState(lesson?.school_id ?? schools[0]?.id ?? "");
   const [classId, setClassId] = useState(lesson?.class_id ?? "");
   const [status, setStatus] = useState<LessonStatus>(lesson?.status ?? "scheduled");
+  const [focus, setFocus] = useState<string[]>(lesson?.focus ?? []);
+  const [focusNote, setFocusNote] = useState(lesson?.focus_note ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
@@ -174,7 +186,6 @@ function LessonForm({
       date: String(formData.get("date")),
       startTime: String(formData.get("start")),
       endTime: String(formData.get("end")),
-      notes: String(formData.get("notes") ?? "") || null,
     };
 
     startTransition(async () => {
@@ -185,6 +196,8 @@ function LessonForm({
             ...input,
             status,
             attendeesCount: status === "done" && raw !== "" ? Number(raw) : null,
+            focus: status === "done" ? focus : [],
+            focusNote: status === "done" ? focusNote : null,
             expectedUpdatedAt: lesson.updated_at,
           }),
           "Lezione aggiornata.",
@@ -312,16 +325,20 @@ function LessonForm({
           </>
         )}
 
-        {lesson && lesson.status === "done" && lesson.focus.length > 0 && (
-          <div className="flex flex-col gap-2 sm:col-span-2">
-            <span className="text-sm font-medium">Focus (registrati dall&apos;istruttore)</span>
-            <FocusList lesson={lesson} />
-          </div>
+        {lesson?.classes && status === "done" && (
+          <Field label="Focus della lezione" htmlFor="focus" className="sm:col-span-2">
+            <FocusPicker
+              id="focus"
+              level={lesson.classes.level}
+              value={focus}
+              note={focusNote}
+              onChange={(f, n) => {
+                setFocus(f);
+                setFocusNote(n);
+              }}
+            />
+          </Field>
         )}
-
-        <Field label="Note interne" htmlFor="notes" className="sm:col-span-2">
-          <Textarea id="notes" name="notes" rows={2} maxLength={1000} defaultValue={lesson?.notes ?? ""} />
-        </Field>
       </div>
 
       {error && (

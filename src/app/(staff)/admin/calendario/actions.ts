@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { addDays, isISODate } from "@/lib/dates";
 import { dbErrorMessage } from "@/lib/forms";
+import { focusNeedsNote, sanitizeFocus } from "@/lib/focus";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
 
@@ -19,7 +20,6 @@ export type LessonInput = {
   date: string;
   startTime: string;
   endTime: string;
-  notes: string | null;
 };
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -45,14 +45,12 @@ function validate(input: LessonInput) {
   const start = input.startTime.slice(0, 5);
   const end = input.endTime.slice(0, 5);
   if (end <= start) throw new InputError("L'orario di fine deve essere dopo l'inizio.");
-  const notes = input.notes?.trim().slice(0, 1000) || null;
 
   return {
     class_id: input.classId,
     date: input.date,
     start_time: start,
     end_time: end,
-    notes,
   };
 }
 
@@ -112,6 +110,8 @@ export async function updateLesson(
   input: LessonInput & {
     status: Enums<"lesson_status">;
     attendeesCount: number | null;
+    focus: string[];
+    focusNote: string | null;
     /** `updated_at` letto all'apertura del dialog. */
     expectedUpdatedAt: string;
   },
@@ -125,12 +125,25 @@ export async function updateLesson(
       throw new InputError("Numero di presenti non valido.");
     }
 
+    const row = validate(input);
     const supabase = await createClient();
+    const { data: cls, error: clsError } = await supabase
+      .from("classes")
+      .select("level")
+      .eq("id", row.class_id)
+      .maybeSingle();
+    if (clsError) return { error: dbErrorMessage(clsError) };
+    if (!cls) throw new InputError("Classe inesistente.");
+    // Focus validati sul livello della classe, come per gli istruttori
+    const isDone = input.status === "done";
+    const focus = isDone ? sanitizeFocus(cls.level, input.focus) : [];
+    const focusNote = isDone && focusNeedsNote(cls.level, focus) ? input.focusNote?.trim().slice(0, 200) || null : null;
+
     // Salva solo se nessuno l'ha cambiata nel frattempo (es. l'istruttore che
     // la registra a bordo vasca): altrimenti si cancellerebbero presenti e focus.
     const { data, error } = await supabase
       .from("lessons")
-      .update({ ...validate(input), status: input.status, attendees_count: attendees })
+      .update({ ...row, status: input.status, attendees_count: attendees, focus, focus_note: focusNote })
       .eq("id", lessonId)
       .eq("updated_at", input.expectedUpdatedAt)
       .select("id");
@@ -204,7 +217,6 @@ export async function createCourse(input: {
       date: dates[0],
       startTime: input.startTime,
       endTime: input.endTime,
-      notes: null,
     });
 
     const supabase = await createClient();

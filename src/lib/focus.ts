@@ -72,6 +72,11 @@ export function focusLabel(id: string, note?: string | null) {
   return f.label;
 }
 
+/** "Gioco con…" e simili richiedono il testo libero. */
+export function focusNeedsNote(level: SchoolLevel, focus: string[]) {
+  return focus.some((id) => focusCatalog(level).find((f) => f.id === id)?.withNote);
+}
+
 /** Filtra e valida i focus inviati dal client per il livello della classe. */
 export function sanitizeFocus(level: SchoolLevel, focus: unknown): string[] {
   if (!Array.isArray(focus)) return [];

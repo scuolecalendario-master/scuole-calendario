@@ -23,6 +23,7 @@ invece della sincronizzazione ho controllato cosa succede quando **due persone m
 | 1.7, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.5 | ✅ corretti nel codice e provati nel browser |
 | 1.8 | ✅ il corso salta le date già presenti (doppio clic provato) e il database rifiuta i doppioni (`lessons_no_duplicates`, migrazione `20260926020000_audit_fixes.sql`) |
 | 1.1, 1.2 | ✅ stessa migrazione, applicata: l'istruttore vede solo i colleghi delle sue classi; massimo 10 richieste al giorno per istituto |
+| 1.1 (28/9) | ⚠️ la correzione aveva tolto al master la lettura dei profili (istruttori “spariti” dalle pagine del master, nessuno cancellato). Rimessa con `20260928010000_master_reads_profiles.sql` |
 | 2.1–2.6, 3.1 | ✅ corretti: seed aggiornato e provato, `badge.tsx` e `@fullcalendar/core` tolti, funzioni inutili tolte o rese private, README nuovo, sorgenti del logo in `design/`, icone da 249 a 60 KB |
 | 1.3 | ➖ lasciato così: le regole per riga bloccano già tutto e il database via web non permette di "svuotare" tabelle |
 | 1.4 | ➖ lasciato così: gli istruttori si registrano da soli con il codice; senza codice l'account non vede nulla |

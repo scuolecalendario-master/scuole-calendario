@@ -347,6 +347,7 @@ export function LessonCalendar({
         editable={editable}
         schools={schools}
         instructors={instructors}
+        currentUserId={currentUserId}
         onClose={() => setDialog(null)}
         onSaved={onSaved}
       />
