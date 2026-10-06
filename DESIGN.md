@@ -73,8 +73,8 @@ Lo stato non si comunica **solo** col colore: c'è sempre anche l'icona o la par
 | Livello | Colore (testo bianco) |
 |---|---|
 | Asilo | `#C0156A` magenta |
-| Elementari | `#087F3A` verde |
-| Medie | `#0052CC` blu |
+| Primaria | `#087F3A` verde |
+| Secondaria | `#0052CC` blu |
 | Superiori | `#7A2FE0` viola |
 
 ### Colori di classi e istituti
@@ -112,14 +112,18 @@ Numeri (orari, presenti, date) sempre con `tabular-nums`.
 | **Badge di stato** | pieno per lo stato corrente in evidenza, tenue negli elenchi; sempre icona + parola. |
 | **Chip focus** | `rounded-full`, altezza ≥ 44 px quando selezionabili (istruttore), compatti in sola lettura (maestre). Selezionato = pieno colore livello + ✓. |
 | **Pulsante primario** | `--primary` pieno, testo bianco, una sola azione primaria per schermata. |
-| **Header staff** | barra `--primary` con testo bianco; voce attiva sottolineata/evidenziata; badge rossi numerici (richieste, da registrare). |
+| **Header staff** | barra `--primary` con testo bianco; voce attiva sottolineata/evidenziata; badge rossi numerici (richieste, da registrare). Su smartphone **una sola riga**: le voci meno usate (`more: true`) stanno sotto “Altro”. |
+| **Sposta lezione** | `MoveLessonForm` / `MoveLessonButton` (`src/components/lessons/move-lesson.tsx`): nuova data + inizio, la durata resta uguale. In cima al dialog della lezione e nelle richieste (dopo lo spostamento la richiesta è gestita). |
+| **Elenchi lunghi da modificare** | una riga di riepilogo per elemento (`<details>`), il modulo si apre con un tocco (es. classi dell'istituto). |
 | **Dialog** | titolo breve, azione primaria a destra, “Annulla” sempre presente. |
-| **Banner “Installa”** | `InstallBanner`: una riga breve + pulsante primario “Installa” + ✕. Android: prompt nativo; iPhone: 3 passaggi illustrati. Mai sopra l'informazione chiave (nel portale va sotto “Prossima lezione”); nascosto se l'app è già installata o chiuso con ✕. |
+| **Banner “Installa”** | `InstallBanner`: una riga breve + pulsante primario “Installa” + ✕. Android: prompt nativo; iPhone: 3 passaggi illustrati. Mai sopra l'informazione chiave (nel portale va sotto “Prossima lezione”, nell'area staff in fondo alla pagina); nascosto se l'app è già installata o chiuso con ✕. |
 | **Messaggi** | errore in `#B3231A` con `role="alert"`; conferma breve (“Salvato”). |
 
 ## 7. Pattern
 
 - **Liste di lezioni**: raggruppate per giorno o per mese; oggi evidenziato; passato attenuato (non nascosto).
+- **Dashboard**: i riquadri vuoti diventano una riga “✓”; in alto solo ciò che richiede attenzione.
+- **Cambio pagina**: `loading.tsx` mostra subito un segnaposto, il tocco ha sempre un effetto visibile.
 - **Date**: “Martedì 29 settembre” (maestre), “mar 29/9” negli spazi stretti. Fuso orario sempre `Europe/Rome` (`src/lib/dates.ts`).
 - **Scelte rapide**: toggle/chip grandi invece di menu a tendina quando le opzioni sono ≤ 10 e servono tocchi veloci.
 - **Moduli**: dopo un errore i campi mantengono i valori (vedi `values`/`key` nelle action); le password no.

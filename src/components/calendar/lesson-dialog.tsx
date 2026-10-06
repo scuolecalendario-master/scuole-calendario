@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarClock } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
@@ -10,6 +11,7 @@ import {
   type LessonActionResult,
 } from "@/app/(staff)/admin/calendario/actions";
 import { FocusPicker } from "@/components/lessons/focus-picker";
+import { MoveLessonForm } from "@/components/lessons/move-lesson";
 import { STATUS_LABEL, StatusBadge, type LessonStatus } from "@/components/lessons/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -167,6 +169,7 @@ function LessonForm({
   const [focus, setFocus] = useState<string[]>(lesson?.focus ?? []);
   const [focusNote, setFocusNote] = useState(lesson?.focus_note ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [moving, setMoving] = useState(false);
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -220,6 +223,19 @@ function LessonForm({
       ? { date: target.lesson.date, start: formatTime(target.lesson.start_time), end: formatTime(target.lesson.end_time) }
       : { date: target.date, start: target.startTime, end: target.endTime };
 
+  if (lesson && moving) {
+    return (
+      <MoveLessonForm
+        lesson={{
+          ...lesson,
+          label: `${lesson.schools?.name} · Classe ${lesson.classes?.grade_name}`,
+        }}
+        onCancel={() => setMoving(false)}
+        onMoved={onSaved}
+      />
+    );
+  }
+
   return (
     <form
       // onSubmit (non action): in caso di errore i campi non vengono azzerati
@@ -235,6 +251,21 @@ function LessonForm({
           {lesson ? `${lesson.schools?.name} · Classe ${lesson.classes?.grade_name}` : "Programma una lezione per una classe."}
         </DialogDescription>
       </DialogHeader>
+
+      {lesson && (
+        // Spostare è l'operazione più frequente: in cima, senza scorrere
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-muted p-3">
+          <p className="min-w-0 flex-1 font-semibold first-letter:uppercase">
+            {formatDay(lesson.date)}
+            <span className="block text-sm font-normal tabular-nums text-muted-foreground">
+              {formatTime(lesson.start_time)}–{formatTime(lesson.end_time)}
+            </span>
+          </p>
+          <Button type="button" variant="outline" className="bg-card" onClick={() => setMoving(true)} disabled={pending}>
+            <CalendarClock aria-hidden /> Sposta
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Istituto" htmlFor="school">
@@ -353,9 +384,10 @@ function LessonForm({
             {confirmDelete ? "Conferma eliminazione" : "Elimina"}
           </Button>
         ) : (
-          <span />
+          <span className="hidden sm:block" />
         )}
-        <div className="flex gap-2">
+        {/* Su smartphone: due pulsanti a tutta larghezza, l'azione principale a destra */}
+        <div className="grid grid-cols-2 gap-2 sm:flex">
           <Button type="button" variant="outline" onClick={onClose} disabled={pending}>
             Annulla
           </Button>

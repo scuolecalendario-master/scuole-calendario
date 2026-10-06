@@ -17,8 +17,8 @@ export type Focus = {
 
 export const LEVELS: { id: SchoolLevel; label: string }[] = [
   { id: "asilo", label: "Asilo" },
-  { id: "elementari", label: "Elementari" },
-  { id: "medie", label: "Medie" },
+  { id: "elementari", label: "Primaria" },
+  { id: "medie", label: "Secondaria" },
   { id: "superiori", label: "Superiori" },
 ];
 

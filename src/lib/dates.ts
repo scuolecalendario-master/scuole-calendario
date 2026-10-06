@@ -56,13 +56,14 @@ function daysBetween(a: string, b: string): number {
   return Math.round((toUTC(b).getTime() - toUTC(a).getTime()) / 86_400_000);
 }
 
-/** "Oggi", "Domani", "Tra 5 giorni", "Tra 3 settimane". */
+/** "Oggi", "Domani", "Tra 5 giorni", "Tra 3 settimane", "Tra 4 mesi". */
 export function relativeDay(date: string, today = todayISO()): string {
   const d = daysBetween(today, date);
   if (d === 0) return "Oggi";
   if (d === 1) return "Domani";
   if (d < 14) return `Tra ${d} giorni`;
-  return `Tra ${Math.round(d / 7)} settimane`;
+  if (d < 60) return `Tra ${Math.round(d / 7)} settimane`;
+  return `Tra ${Math.round(d / 30.4)} mesi`;
 }
 
 const monthFormat = new Intl.DateTimeFormat("it-IT", { month: "long", year: "numeric", timeZone: "UTC" });

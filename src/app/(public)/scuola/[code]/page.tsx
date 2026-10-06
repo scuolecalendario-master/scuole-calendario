@@ -43,8 +43,6 @@ export default async function SchoolPortalPage({ params, searchParams }: PagePro
         <p className="mt-1 text-muted-foreground">Tocca la tua classe: la ricorderemo per la prossima volta.</p>
       </header>
 
-      <InstallBanner text="Apri il calendario con un tocco dalla Home." className="mb-6" />
-
       {groups.length === 0 ? (
         <p className="py-12 text-center text-muted-foreground">Nessuna classe inserita per ora.</p>
       ) : (
@@ -88,6 +86,7 @@ export default async function SchoolPortalPage({ params, searchParams }: PagePro
           ))}
         </div>
       )}
+      <InstallBanner text="Apri il calendario con un tocco dalla Home." className="mt-8" />
     </main>
   );
 }

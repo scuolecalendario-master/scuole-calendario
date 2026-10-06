@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 
 import { ConfirmAction } from "@/components/confirm-action";
 import { CopyButton, useOrigin } from "@/components/copy-button";
@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { LEVELS, type SchoolLevel } from "@/lib/focus";
+import { LEVEL_STYLE } from "@/lib/colors";
+import { LEVEL_LABEL, LEVELS, type SchoolLevel } from "@/lib/focus";
+import { cn } from "@/lib/utils";
 import type { ActionState } from "@/lib/forms";
 import { useFormAction } from "@/lib/use-form-action";
 
@@ -138,31 +140,51 @@ export function ClassRow({
 }) {
   const { state, pending, onSubmit } = useFormAction(updateAction);
   const origin = useOrigin();
+  const names = data.instructorIds
+    .map((id) => options.instructors.find((i) => i.id === id)?.name)
+    .filter(Boolean) as string[];
 
+  // Chiusa = una riga di riepilogo: con 30+ classi la pagina resta breve
   return (
-    <li className="rounded-2xl border bg-card p-3 sm:p-4">
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <ClassFields data={data} idPrefix={`c-${data.id}`} {...options} />
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="submit" disabled={pending}>
-            {pending ? "Salvataggio…" : "Salva"}
-          </Button>
-          <CopyButton text={`${origin}${classPath}`} label="Copia link classe" />
-          <span className="ml-auto text-sm text-muted-foreground">{data.lessonsCount} lezioni</span>
-          <ConfirmAction
-            action={deleteAction}
-            trigger="Elimina"
-            title={`Eliminare la classe ${data.grade_name}?`}
-            description={
-              data.lessonsCount > 0
-                ? `Verranno eliminate anche le sue ${data.lessonsCount} lezioni, con presenze e focus registrati. L'operazione non è reversibile.`
-                : "La classe non ha lezioni. L'operazione non è reversibile."
-            }
-            confirmLabel="Elimina classe"
-          />
-        </div>
-        <FormMessage state={state} />
-      </form>
+    <li>
+      <details className="group/row rounded-2xl border bg-card open:border-primary/50">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-3 py-2 sm:px-4 [&::-webkit-details-marker]:hidden">
+          <span className="text-lg font-bold">{data.grade_name}</span>
+          <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", LEVEL_STYLE[data.level].solid)}>
+            {LEVEL_LABEL[data.level]}
+          </span>
+          <span className="min-w-0 flex-1 text-sm leading-snug">
+            <span className="tabular-nums">{data.total_enrolled} iscritti</span>
+            <span className={cn("block truncate", names.length ? "text-muted-foreground" : "font-semibold text-cancelled-text")}>
+              {names.length ? names.join(", ") : "Nessun istruttore"}
+            </span>
+          </span>
+          <span className="hidden text-sm font-semibold text-primary sm:inline group-open/row:hidden">Modifica</span>
+          <ChevronDown className="size-5 shrink-0 text-primary transition-transform group-open/row:rotate-180" aria-hidden />
+        </summary>
+        <form onSubmit={onSubmit} className="flex flex-col gap-3 border-t p-3 sm:p-4">
+          <ClassFields data={data} idPrefix={`c-${data.id}`} {...options} />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={pending}>
+              {pending ? "Salvataggio…" : "Salva"}
+            </Button>
+            <CopyButton text={`${origin}${classPath}`} label="Copia link classe" />
+            <span className="ml-auto text-sm text-muted-foreground">{data.lessonsCount} lezioni</span>
+            <ConfirmAction
+              action={deleteAction}
+              trigger="Elimina"
+              title={`Eliminare la classe ${data.grade_name}?`}
+              description={
+                data.lessonsCount > 0
+                  ? `Verranno eliminate anche le sue ${data.lessonsCount} lezioni, con presenze e focus registrati. L'operazione non è reversibile.`
+                  : "La classe non ha lezioni. L'operazione non è reversibile."
+              }
+              confirmLabel="Elimina classe"
+            />
+          </div>
+          <FormMessage state={state} />
+        </form>
+      </details>
     </li>
   );
 }

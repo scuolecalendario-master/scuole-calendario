@@ -1,6 +1,7 @@
 import { CalendarSearch, Check, Undo2 } from "lucide-react";
 import Link from "next/link";
 
+import { MoveLessonButton } from "@/components/lessons/move-lesson";
 import { NotificationsToggle } from "@/components/notifications-toggle";
 import { getOpenRequests } from "@/lib/admin-stats";
 import { formatCompact, formatDay, formatTime } from "@/lib/dates";
@@ -70,9 +71,17 @@ export default async function RequestsPage() {
               )}
               <div className="flex flex-wrap gap-2">
                 {r.lessons && (
+                  <MoveLessonButton
+                    lesson={{ ...r.lessons, label: `${r.schools?.name} · Classe ${r.lessons.classes?.grade_name}` }}
+                    proposal={{ date: r.proposed_date, time: r.proposed_time }}
+                    // Spostata = richiesta gestita
+                    onMoved={setRequestHandled.bind(null, r.id, true)}
+                  />
+                )}
+                {r.lessons && (
                   <Link
                     href={`/admin/calendario?data=${r.lessons.date}&lezione=${r.lessons.id}`}
-                    className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-primary-foreground"
+                    className="flex min-h-11 items-center gap-2 rounded-xl border-2 px-4 font-semibold"
                   >
                     <CalendarSearch className="size-5" aria-hidden /> Apri nel calendario
                   </Link>

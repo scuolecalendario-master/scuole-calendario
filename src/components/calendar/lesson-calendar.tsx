@@ -21,7 +21,10 @@ import timeGridPlugin from "@fullcalendar/react/timegrid";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { moveLesson } from "@/app/(staff)/admin/calendario/actions";
+import { Plus } from "lucide-react";
+
 import { STATUS_LABEL } from "@/components/lessons/status-badge";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { createClient } from "@/lib/supabase/client";
@@ -170,6 +173,23 @@ export function LessonCalendar({
     setDialog({ mode: "create", date: start.date, startTime, endTime });
   }
 
+  /** Nuova lezione nel giorno visualizzato (oggi se è nel periodo), alle 9:00. */
+  function newLesson() {
+    const api = calendarRef.current?.getApi();
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE }).format(new Date());
+    // formatIso usa il fuso del calendario (toISOString darebbe il giorno prima a mezzanotte)
+    const from = api ? api.formatIso(api.view.activeStart, true) : today;
+    const to = api ? api.formatIso(api.view.activeEnd, true) : today;
+    let date = today >= from && today < to ? today : from;
+    // La domenica è nascosta: si passa al lunedì
+    if (new Date(`${date}T12:00:00Z`).getUTCDay() === 0) {
+      const d = new Date(`${date}T12:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + 1);
+      date = d.toISOString().slice(0, 10);
+    }
+    setDialog({ mode: "create", date, startTime: "09:00", endTime: addMinutes("09:00", DEFAULT_DURATION_MIN) });
+  }
+
   async function onMove(info: EventChangeInfo) {
     const start = splitStr(info.event.startStr);
     const end = info.event.endStr ? splitStr(info.event.endStr) : null;
@@ -289,13 +309,26 @@ export function LessonCalendar({
       {notice && (
         <p
           role={notice.type === "error" ? "alert" : "status"}
-          className={notice.type === "error" ? "text-sm text-destructive" : "text-sm text-muted-foreground"}
+          className={
+            notice.type === "error"
+              ? "rounded-xl bg-cancelled-soft px-3 py-2 font-semibold text-cancelled-text"
+              : "rounded-xl bg-done-soft px-3 py-2 font-semibold text-done-text"
+          }
         >
+          {notice.type === "error" ? "✕ " : "✓ "}
           {notice.text}
         </p>
       )}
 
-      {isMobile && title && <h2 className="text-center text-lg font-bold first-letter:uppercase">{title}</h2>}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {isMobile && title && <h2 className="text-lg font-bold first-letter:uppercase">{title}</h2>}
+        {editable && (
+          // Sempre disponibile: nella vista elenco non si può selezionare uno spazio vuoto
+          <Button type="button" className="ml-auto" onClick={newLesson}>
+            <Plus aria-hidden /> Nuova<span className="hidden sm:inline">&nbsp;lezione</span>
+          </Button>
+        )}
+      </div>
 
       <div className="lesson-calendar">
         <FullCalendar
@@ -303,8 +336,8 @@ export function LessonCalendar({
           plugins={[formaTheme, dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
           locale={itLocale}
           timeZone={TIME_ZONE}
-          // Su smartphone si parte dal giorno (più leggibile); le viste sono le stesse ovunque
-          initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
+          // Su smartphone si parte dall'elenco della settimana (più leggibile); le viste sono le stesse ovunque
+          initialView={isMobile ? "listWeek" : "timeGridWeek"}
           initialDate={initialDate}
           datesSet={(info: DatesSetInfo) => setTitle(info.view.title)}
           headerToolbar={
@@ -323,7 +356,8 @@ export function LessonCalendar({
           slotHeaderInterval="01:00:00"
           nowIndicator
           // Vista elenco su smartphone: il titolo va a capo invece di essere troncato
-          listItemEventTitleClass="whitespace-normal break-words"
+          // "!" perché il tema imposta nowrap con priorità maggiore
+          listItemEventTitleClass="whitespace-normal! break-words overflow-visible!"
           listItemEventInnerClass="flex-wrap"
           height="auto"
           // Filtri: una nuova funzione events fa ricaricare le lezioni

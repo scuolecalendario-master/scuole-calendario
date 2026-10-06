@@ -19,8 +19,9 @@ export default async function InstructorLayout({ children }: LayoutProps<"/istru
         userLabel={profile.full_name ?? profile.email ?? ""}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
-        <InstallBanner text="Apri l'app con un tocco dalla Home." className="mb-4" />
         {children}
+        {/* In fondo: mai sopra l'informazione chiave (DESIGN.md §6) */}
+        <InstallBanner text="Apri l'app con un tocco dalla Home." className="mt-8" />
       </main>
     </div>
   );

@@ -21,12 +21,12 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           { href: "/admin/calendario", label: "Calendario" },
           // Il master che insegna: le sue classi, come un istruttore
           { href: "/istruttore/oggi", label: "Le mie lezioni" },
-          { href: "/admin/programma", label: "Corsi" },
-          { href: "/admin/richieste", label: "Richieste", badge: openRequests },
-          { href: "/admin/scuole", label: "Istituti" },
-          { href: "/admin/istruttori", label: "Istruttori" },
-          { href: "/admin/report", label: "Report" },
-          { href: "/admin/backup", label: "Backup" },
+          { href: "/admin/programma", label: "Corsi", more: true },
+          { href: "/admin/richieste", label: "Richieste", badge: openRequests, more: true },
+          { href: "/admin/scuole", label: "Istituti", more: true },
+          { href: "/admin/istruttori", label: "Istruttori", more: true },
+          { href: "/admin/report", label: "Report", more: true },
+          { href: "/admin/backup", label: "Backup", more: true },
         ]}
         userLabel={profile.full_name ?? profile.email ?? ""}
         actions={
@@ -45,8 +45,9 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         }
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
-        <InstallBanner text="Apri l'app con un tocco dalla Home." className="mb-4" />
         {children}
+        {/* In fondo: mai sopra l'informazione chiave (DESIGN.md §6) */}
+        <InstallBanner text="Apri l'app con un tocco dalla Home." className="mt-8" />
       </main>
     </div>
   );

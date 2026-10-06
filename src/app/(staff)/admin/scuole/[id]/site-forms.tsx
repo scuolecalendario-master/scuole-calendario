@@ -32,7 +32,8 @@ export function SiteHeader({
         aria-label="Nome del plesso"
         maxLength={120}
         required
-        className="h-11 max-w-sm flex-1 text-lg font-semibold"
+        // Su smartphone il nome ha una riga tutta per sé (non viene schiacciato dai pulsanti)
+        className="h-11 min-w-0 basis-full text-lg font-semibold sm:max-w-sm sm:flex-1 sm:basis-auto"
       />
       <Button type="submit" variant="outline" disabled={pending}>
         Rinomina
@@ -64,7 +65,7 @@ export function NewSiteForm({ action }: { action: FormAction }) {
         aria-label="Nome del nuovo plesso"
         maxLength={120}
         required
-        className="h-11 max-w-sm flex-1"
+        className="h-11 min-w-0 max-w-sm flex-1"
       />
       <Button type="submit" disabled={pending}>
         + Plesso
